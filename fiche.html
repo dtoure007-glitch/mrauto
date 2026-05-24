@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Fiche voiture — MR Auto Canada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Détail voiture MR Auto Canada — Dakar" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; outline: none; cursor: pointer; }
+    img { display: block; }
+
+    :root {
+      --bg:             #ffffff;
+      --bg-alt:         #f5f5f5;
+      --card-bg:        #ffffff;
+      --text:           #111111;
+      --text-muted:     rgba(17,17,17,0.48);
+      --accent:         #E2001A;
+      --accent-on-dark: #ff4d4d;
+      --accent-pale:    rgba(226,0,26,0.07);
+      --border:         rgba(17,17,17,0.1);
+      --chip-bg:        rgba(17,17,17,0.05);
+      --nav-bg:         rgba(255,255,255,0.97);
+      --font-display:   'Barlow Condensed', sans-serif;
+      --font-body:      'Barlow', sans-serif;
+      --radius:         0px;
+    }
+
+    .max-w { max-width: 1280px; margin: 0 auto; }
+
+    @media (max-width: 900px) {
+      .fiche-grid      { grid-template-columns: 1fr !important; }
+      .fiche-gallery   { position: static !important; height: 400px !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; }
+      .fiche-info      { padding: 36px 24px 60px !important; }
+    }
+    @media (max-width: 640px) {
+      .fiche-gallery   { height: 480px !important; }
+      .fiche-info      { padding: 28px 20px 52px !important; }
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #root { animation: pageFadeIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" src="hifi-components.jsx"></script>
+
+  <script type="text/babel">
+    const { createClient } = window.supabase;
+    const sb = createClient(
+      'https://tunszuazffcniyaylxwj.supabase.co',
+      'sb_publishable_ORGOouzE5_jT5BCgqWLhKQ_Z3XnrPW7'
+    );
+
+    function goBack(fallback) {
+      try {
+        if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+          history.back(); return;
+        }
+      } catch(e) {}
+      window.location.href = fallback;
+    }
+
+    // ── GALERIE PHOTOS ────────────────────────────────────────────────────────
+    function PhotoGallery({ photos, brand, model }) {
+      const [idx, setIdx] = React.useState(0);
+      const isMobile = useIsMobile();
+      const has = photos && photos.length > 0;
+
+      if (!has) {
+        return (
+          <div style={{ height: '100%', minHeight: 480, background: 'linear-gradient(150deg,#d8d8d8 0%,#c4c4c4 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 10, position: 'relative' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, letterSpacing: '0.22em', color: 'rgba(0,0,0,0.25)', textTransform: 'uppercase' }}>{brand} {model}</span>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 9, letterSpacing: '0.14em', color: 'rgba(0,0,0,0.18)', textTransform: 'uppercase' }}>photos à venir</span>
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'var(--accent)' }} />
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ position: 'relative', flex: 1, overflow: 'hidden', minHeight: 0 }}>
+            <img src={photos[idx]} alt={`${brand} ${model} — photo ${idx + 1}`}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 3, background: 'var(--accent)' }} />
+            {photos.length > 1 && (
+              <>
+                <button onClick={() => setIdx(i => (i - 1 + photos.length) % photos.length)}
+                  style={{ position: 'absolute', left: 14, ...(isMobile ? { bottom: 16 } : { top: '50%', transform: 'translateY(-50%)' }), width: 44, height: 44, background: 'rgba(255,255,255,0.92)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 22, color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>‹</button>
+                <button onClick={() => setIdx(i => (i + 1) % photos.length)}
+                  style={{ position: 'absolute', right: 14, ...(isMobile ? { bottom: 16 } : { top: '50%', transform: 'translateY(-50%)' }), width: 44, height: 44, background: 'rgba(255,255,255,0.92)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: 22, color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>›</button>
+                <div style={{ position: 'absolute', bottom: 12, right: isMobile ? 72 : 14, background: 'rgba(0,0,0,0.5)', color: '#fff', fontFamily: 'var(--font-body)', fontSize: 10, padding: '3px 8px', letterSpacing: '0.1em' }}>
+                  {idx + 1}/{photos.length}
+                </div>
+              </>
+            )}
+          </div>
+          {photos.length > 1 && (
+            <div style={{ display: 'flex', gap: 4, padding: isMobile ? '8px 8px 10px' : 8, background: 'var(--bg-alt)', overflowX: 'auto', flexShrink: 0 }}>
+              {photos.map((url, i) => (
+                <div key={i} onClick={() => setIdx(i)}
+                  style={{ width: isMobile ? 88 : 82, height: isMobile ? 80 : 60, flexShrink: 0, cursor: 'pointer', border: i === idx ? '2px solid var(--accent)' : '2px solid transparent', overflow: 'hidden', transition: 'border-color 0.15s' }}>
+                  <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ── NAVIGATION FICHE ──────────────────────────────────────────────────────
+    function FicheNav() {
+      const isMobile = useIsMobile();
+      return (
+        <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'var(--nav-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ height: 2, background: 'var(--accent)' }} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 40px', height: 66 }}>
+            <a href="catalogue.html"
+              onClick={e => { e.preventDefault(); goBack('catalogue.html'); }}
+              style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', transition: 'color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+              ← {isMobile ? 'Retour' : 'Catalogue'}
+            </a>
+            <img src="logo.jpg" alt="MR Auto Canada" style={{ height: isMobile ? 36 : 40, width: isMobile ? 36 : 40, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center' }} />
+            <HifiBtn variant="whatsapp" size="sm" href="https://wa.me/221XXXXXXXXX" style={{ gap: 6 }}>
+              <WaIcon size={13} /> {isMobile ? '' : 'WhatsApp'}
+            </HifiBtn>
+          </div>
+        </nav>
+      );
+    }
+
+    // ── PAGE FICHE ────────────────────────────────────────────────────────────
+    function FichePage({ car }) {
+      const msg = encodeURIComponent(
+        `Bonjour MR Auto Canada, je suis intéressé(e) par la ${car.brand} ${car.model} ${car.year} à ${car.price}. Est-elle toujours disponible ?`
+      );
+
+      return (
+        <>
+          <FicheNav />
+          <main style={{ paddingTop: 68 }}>
+            <div className="fiche-grid" style={{ display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', minHeight: 'calc(100vh - 68px)' }}>
+
+              {/* Galerie */}
+              <div className="fiche-gallery" style={{ position: 'sticky', top: 68, height: 'calc(100vh - 68px)', overflow: 'hidden', borderRight: '1px solid var(--border)' }}>
+                <PhotoGallery photos={car.photos || []} brand={car.brand} model={car.model} />
+              </div>
+
+              {/* Infos */}
+              <div className="fiche-info" style={{ padding: '52px 52px 80px', display: 'flex', flexDirection: 'column', gap: 28, background: 'var(--bg)', overflowY: 'auto' }}>
+
+                {car.badge &&
+                  <HifiBadge variant="new" style={{ alignSelf: 'flex-start' }}>{car.badge}</HifiBadge>
+                }
+
+                <div>
+                  <div style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--accent)', marginBottom: 10 }}>
+                    {car.year}
+                  </div>
+                  <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(52px,5.5vw,80px)', fontWeight: 900, color: 'var(--text)', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em' }}>
+                    {car.brand}<br />{car.model}
+                  </h1>
+                </div>
+
+                <div style={{ fontFamily: 'var(--font-body)', fontSize: 26, fontWeight: 700, color: 'var(--accent)', letterSpacing: '0.02em' }}>
+                  {car.price}
+                </div>
+
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  <SpecChip>{car.km}</SpecChip>
+                  <SpecChip>{car.fuel}</SpecChip>
+                  <SpecChip>{car.transmission}</SpecChip>
+                  <SpecChip>{car.color}</SpecChip>
+                </div>
+
+                <div style={{ height: 1, background: 'var(--border)' }} />
+
+                {car.description &&
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.72 }}>{car.description}</p>
+                }
+
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {['✓ Papiers vérifiés', '✓ Essai gratuit', '✓ Livraison domicile'].map((t, i) => (
+                    <span key={i} style={{ display: 'inline-flex', alignItems: 'center', padding: '5px 12px', background: 'var(--accent-pale)', color: 'var(--text)', fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 500, border: '1px solid var(--border)' }}>{t}</span>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <HifiBtn variant="whatsapp" size="lg" href={`https://wa.me/221XXXXXXXXX?text=${msg}`} full style={{ gap: 10 }}>
+                    <WaIcon size={18} /> Écrire sur WhatsApp
+                  </HifiBtn>
+                  <HifiBtn variant="outline" size="lg" href="tel:+221XXXXXXXXX" full>
+                    ☎ Appeler
+                  </HifiBtn>
+                </div>
+
+
+              </div>
+            </div>
+          </main>
+          <HifiFooter />
+        </>
+      );
+    }
+
+    // ── APP ───────────────────────────────────────────────────────────────────
+    function App() {
+      const [car, setCar] = React.useState(null);
+      const [loading, setLoading] = React.useState(true);
+      const [notFound, setNotFound] = React.useState(false);
+
+      React.useEffect(() => {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) { setNotFound(true); setLoading(false); return; }
+        sb.from('cars').select('*').eq('id', id).single()
+          .then(({ data, error }) => {
+            if (error || !data) setNotFound(true);
+            else setCar(data);
+            setLoading(false);
+          });
+      }, []);
+
+      if (loading) return (
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          Chargement…
+        </div>
+      );
+
+      if (notFound) return (
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 24, padding: 40 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 56, fontWeight: 900, color: 'var(--text)', textTransform: 'uppercase', lineHeight: 1, textAlign: 'center' }}>Voiture<br />introuvable</div>
+          <HifiBtn variant="outline" onClick={() => goBack('catalogue.html')}>← Retour au catalogue</HifiBtn>
+        </div>
+      );
+
+      return <FichePage car={car} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

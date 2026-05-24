@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>MR Auto — Aperçu Palettes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0A0A0A; font-family: 'Barlow', sans-serif; color: #fff; padding: 48px 32px; }
+
+    .page-title { text-align: center; margin-bottom: 60px; }
+    .page-title h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #555; margin-bottom: 12px; }
+    .page-title h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 42px; font-weight: 900; text-transform: uppercase; color: #fff; letter-spacing: 0.02em; }
+
+    .palettes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1400px; margin: 0 auto; }
+    .palette-wrapper { display: flex; flex-direction: column; }
+
+    .palette-label { padding: 16px 20px 14px; background: #181818; border: 1px solid #2a2a2a; border-bottom: none; }
+    .palette-label .num { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.25em; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+    .palette-label .name { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
+    .palette-label .desc { font-size: 12px; color: #777; margin-top: 4px; line-height: 1.5; }
+
+    .mockup { border: 1px solid #2a2a2a; overflow: hidden; }
+
+    /* ── PALETTES CSS VARS ── */
+    .p1 { --nav:#111111; --bg:#1A1A1A; --bg-alt:#202020; --card:#252525; --cta:#D42B2B; --text:#FFFFFF; --text-m:#A0A0A0; --border:#2E2E2E; --accent:#D42B2B; --stripe:#D42B2B; }
+    .p2 { --nav:#111111; --bg:#F7F7F7; --bg-alt:#EEEEEE; --card:#FFFFFF; --cta:#D42B2B; --text:#111111; --text-m:#666666; --border:#E0E0E0; --accent:#D42B2B; --stripe:#D42B2B; }
+    .p3 { --nav:#D42B2B; --bg:#FFFFFF; --bg-alt:#FDF4F4; --card:#FFFFFF; --cta:#111111; --text:#111111; --text-m:#888888; --border:#E8D0D0; --accent:#D42B2B; --stripe:#111111; }
+    /* Nouvelles palettes premium */
+    .p4 { --nav:#080808; --bg:#0D0D0D; --bg-alt:#121212; --card:#171717; --cta:#D42B2B; --text:#F0F0F0; --text-m:#525252; --border:#1C1C1C; --accent:#D42B2B; --stripe:#D42B2B; }
+    .p5 { --nav:#FFFFFF; --bg:#FAFAFA; --bg-alt:#F4F4F4; --card:#FFFFFF; --cta:#D42B2B; --text:#111111; --text-m:#888888; --border:#E8E8E8; --accent:#D42B2B; --stripe:#D42B2B; }
+
+    /* ── NAV ── */
+    .m-nav { background: var(--nav); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; height: 44px; border-bottom: 2px solid var(--stripe); }
+    .m-logo img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; display: block; }
+    .m-nav-links { display: flex; gap: 10px; }
+    .m-nav-links span { font-size: 8px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; }
+    .p1 .m-nav-links span, .p4 .m-nav-links span { color: rgba(255,255,255,0.45); }
+    .p2 .m-nav-links span, .p3 .m-nav-links span { color: rgba(255,255,255,0.7); }
+    .p5 .m-nav-links span { color: #666666; }
+    .m-nav-cta { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 5px 10px; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .p1 .m-nav-cta, .p2 .m-nav-cta, .p4 .m-nav-cta, .p5 .m-nav-cta { background: #25D366; color: #fff; }
+    .p3 .m-nav-cta { background: #111111; color: #fff; }
+
+    /* ── HERO ── */
+    .m-hero { background: var(--bg); padding: 22px 16px 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; border-bottom: 1px solid var(--border); }
+    .m-hero-left { display: flex; flex-direction: column; gap: 9px; }
+    .m-hero-kicker { font-size: 8px; font-weight: 700; letter-spacing: 0.26em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 5px; }
+    .m-hero-kicker::before { content:''; display:block; width:12px; height:2px; background:var(--accent); }
+    .m-hero-h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 900; text-transform: uppercase; line-height: 0.93; color: var(--text); }
+    .m-hero-sub { font-size: 9px; color: var(--text-m); line-height: 1.65; }
+    .m-hero-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .m-chip { font-size: 7px; font-weight: 500; padding: 3px 6px; border: 1px solid var(--border); color: var(--text); background: transparent; }
+    .m-hero-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .m-btn-primary { font-family: 'Barlow Condensed', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 12px; background: var(--cta); color: #fff; border: none; }
+    .m-btn-wa { font-family: 'Barlow Condensed', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 12px; background: #25D366; color: #fff; border: none; }
+    .m-hero-img { overflow: hidden; min-height: 110px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .p1 .m-hero-img, .p4 .m-hero-img { background: linear-gradient(135deg,#1a1a1a,#2a2a2a); }
+    .p2 .m-hero-img { background: linear-gradient(135deg,#e0e0e0,#c8c8c8); }
+    .p3 .m-hero-img, .p5 .m-hero-img { background: linear-gradient(135deg,#f0e8e8,#e0d0d0); }
+    .m-hero-img::after { content:'PHOTO VOITURE'; font-size:7px; font-weight:700; letter-spacing:0.2em; opacity:0.3; }
+    .p1 .m-hero-img::after, .p4 .m-hero-img::after { color: #fff; }
+    .p2 .m-hero-img::after { color: #111; }
+    .p3 .m-hero-img::after, .p5 .m-hero-img::after { color: #D42B2B; }
+    .m-hero-img-stripe { position:absolute; bottom:0; left:0; right:0; height:3px; background:var(--stripe); }
+
+    /* ── STATS ── */
+    .m-stats { background:#111111; display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid #1a1a1a; }
+    .p4 .m-stats { background:#060606; border-bottom:1px solid #111; }
+    .m-stat { text-align:center; padding:10px 4px; border-right:1px solid rgba(255,255,255,0.06); }
+    .m-stat:last-child { border-right:none; }
+    .m-stat-n { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:900; line-height:1; letter-spacing:-0.02em; color:#D42B2B; }
+    .m-stat-l { font-size:7px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.28); margin-top:2px; }
+
+    /* ── CATALOGUE ── */
+    .m-cards-section { background:var(--bg); padding:16px 14px; }
+    .m-section-header { margin-bottom:12px; }
+    .m-section-kicker { font-size:8px; font-weight:700; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:5px; margin-bottom:3px; }
+    .m-section-kicker::before { content:''; display:block; width:10px; height:2px; background:var(--accent); }
+    .m-section-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:900; text-transform:uppercase; color:var(--text); letter-spacing:0.02em; line-height:0.95; }
+    .m-cards-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
+    .m-card { background:var(--card); border:1px solid var(--border); overflow:hidden; }
+    .m-card-img { height:58px; display:flex; align-items:center; justify-content:center; font-size:7px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; position:relative; }
+    .p1 .m-card-img, .p4 .m-card-img { background:#222; color:#444; }
+    .p2 .m-card-img, .p5 .m-card-img { background:#EAEAEA; color:#AAAAAA; }
+    .p3 .m-card-img { background:#F5E8E8; color:#C0A0A0; }
+    .m-card-img-stripe { position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--stripe); }
+    .m-card-body { padding:7px 9px 9px; }
+    .m-card-brand { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:900; text-transform:uppercase; color:var(--text); line-height:1; }
+    .m-card-model { font-size:7px; color:var(--text-m); margin-top:1px; margin-bottom:5px; }
+    .m-card-price { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; color:var(--accent); margin-bottom:5px; }
+    .m-card-btn { width:100%; font-family:'Barlow Condensed',sans-serif; font-size:7px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; padding:5px 8px; border:none; cursor:pointer; text-align:center; }
+    .p1 .m-card-btn, .p2 .m-card-btn, .p4 .m-card-btn, .p5 .m-card-btn { background:#D42B2B; color:#fff; }
+    .p3 .m-card-btn { background:#111111; color:#fff; }
+
+    /* ── DÉMARCHE ── */
+    .m-demarche { padding:16px 14px; background:var(--bg-alt); border-top:1px solid var(--border); }
+    .m-demarche-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin-top:11px; }
+    .m-step { background:var(--card); border:1px solid var(--border); overflow:hidden; }
+    .m-step-stripe { height:2px; background:var(--stripe); }
+    .m-step-body { padding:7px 7px 9px; }
+    .m-step-num { font-family:'Barlow Condensed',sans-serif; font-size:24px; font-weight:900; line-height:1; margin-bottom:3px; }
+    .p1 .m-step-num, .p4 .m-step-num { color:rgba(255,255,255,0.05); }
+    .p2 .m-step-num, .p5 .m-step-num { color:rgba(17,17,17,0.06); }
+    .p3 .m-step-num { color:rgba(212,43,43,0.09); }
+    .m-step-title { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:900; text-transform:uppercase; color:var(--text); line-height:1.1; margin-bottom:3px; }
+    .m-step-desc { font-size:7px; color:var(--text-m); line-height:1.5; }
+
+    /* ── SOCIAL PROOF ── */
+    .m-proof { padding:16px 14px; border-top:1px solid var(--border); display:grid; grid-template-columns:0.55fr 1fr; gap:12px; align-items:center; background:var(--bg); }
+    .m-proof-left { display:flex; flex-direction:column; gap:5px; }
+    .m-proof-big { font-family:'Barlow Condensed',sans-serif; font-size:60px; font-weight:900; line-height:0.88; letter-spacing:-0.03em; text-transform:uppercase; color:var(--accent); }
+    .m-proof-title { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:900; text-transform:uppercase; line-height:1.1; color:var(--text); }
+    .m-proof-sub { font-size:8px; color:var(--text-m); line-height:1.6; }
+    .m-proof-btn { font-family:'Barlow Condensed',sans-serif; font-size:7px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; padding:5px 9px; background:transparent; border:1px solid var(--border); color:var(--text); cursor:pointer; align-self:flex-start; }
+    .p3 .m-proof-btn, .p5 .m-proof-btn { border-color:var(--accent); color:var(--accent); }
+    .m-proof-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
+    .m-proof-cell { position:relative; overflow:hidden; }
+    .m-proof-cell-img { height:44px; display:flex; align-items:center; justify-content:center; font-size:6px; letter-spacing:0.1em; text-transform:uppercase; }
+    .p1 .m-proof-cell-img, .p4 .m-proof-cell-img { background:#1E1E1E; color:#3A3A3A; }
+    .p2 .m-proof-cell-img, .p5 .m-proof-cell-img { background:#E4E4E4; color:#BBBBBB; }
+    .p3 .m-proof-cell-img { background:#F0E0E0; color:#C8A8A8; }
+    .m-proof-cell-bar { position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--accent); }
+    .m-proof-badge { position:absolute; top:3px; left:3px; font-size:6px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:1px 3px; }
+    .p1 .m-proof-badge, .p2 .m-proof-badge, .p4 .m-proof-badge { background:rgba(17,17,17,0.8); color:#fff; }
+    .p3 .m-proof-badge, .p5 .m-proof-badge { background:rgba(212,43,43,0.85); color:#fff; }
+
+    /* ── CTA PUSH ── */
+    .m-cta { padding:20px; text-align:center; border-top:2px solid var(--stripe); }
+    .p1 .m-cta, .p2 .m-cta, .p3 .m-cta, .p5 .m-cta { background:#111111; }
+    .p4 .m-cta { background:#060606; }
+    .m-cta-label { font-size:8px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; margin-bottom:8px; color:#D42B2B; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .m-cta-label::before, .m-cta-label::after { content:''; display:block; width:14px; height:2px; background:#D42B2B; }
+    .m-cta-h { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; text-transform:uppercase; color:#fff; line-height:0.95; margin-bottom:8px; letter-spacing:0.01em; }
+    .m-cta-sub { font-size:9px; color:rgba(255,255,255,0.35); line-height:1.6; margin-bottom:14px; }
+    .m-cta-btns { display:flex; justify-content:center; gap:6px; }
+    .m-cta-btn-wa { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:8px 14px; background:#25D366; color:#fff; border:none; }
+    .m-cta-btn-ghost { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:8px 14px; background:transparent; border:1px solid rgba(255,255,255,0.2); color:#fff; }
+
+    /* ── CONTACT ── */
+    .m-contact { padding:16px 14px; background:var(--bg-alt); border-top:1px solid var(--border); display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .m-contact-left { display:flex; flex-direction:column; gap:5px; }
+    .m-contact-kicker { font-size:8px; font-weight:700; letter-spacing:0.24em; text-transform:uppercase; color:var(--accent); display:flex; align-items:center; gap:5px; }
+    .m-contact-kicker::before { content:''; display:block; width:10px; height:2px; background:var(--accent); }
+    .m-contact-title { font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:900; text-transform:uppercase; color:var(--text); line-height:0.95; margin-bottom:2px; }
+    .m-contact-sub { font-size:8px; color:var(--text-m); line-height:1.5; margin-bottom:3px; }
+    .m-cinfo-wa { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; padding:7px 9px; background:#25D366; color:#fff; border:none; text-align:left; }
+    .m-cinfo-tel { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:0.10em; text-transform:uppercase; padding:7px 9px; background:transparent; border:1px solid var(--border); color:var(--text); text-align:left; }
+    .p3 .m-cinfo-tel, .p5 .m-cinfo-tel { border-color:var(--accent); color:var(--accent); }
+    .m-cinfo-addr { padding:7px 8px; border:1px solid var(--border); font-size:8px; color:var(--text-m); line-height:1.5; }
+    .m-cinfo-addr strong { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:900; text-transform:uppercase; color:var(--text); display:block; }
+    .m-contact-right { background:var(--card); border:1px solid var(--border); overflow:hidden; }
+    .m-contact-stripe { height:2px; background:var(--stripe); }
+    .m-contact-form { padding:9px 10px 11px; display:flex; flex-direction:column; gap:5px; }
+    .m-form-title { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:900; text-transform:uppercase; color:var(--text); margin-bottom:2px; }
+    .m-field { display:flex; flex-direction:column; gap:2px; }
+    .m-label { font-size:7px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--text-m); }
+    .m-input { height:20px; border:1px solid var(--border); background:var(--bg); padding:0 6px; font-size:8px; color:var(--text-m); }
+    .p1 .m-input, .p4 .m-input { background:var(--bg-alt); }
+    .m-textarea { height:30px; border:1px solid var(--border); background:var(--bg); padding:4px 6px; font-size:8px; color:var(--text-m); resize:none; }
+    .p1 .m-textarea, .p4 .m-textarea { background:var(--bg-alt); }
+    .m-submit { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; padding:7px; border:none; cursor:pointer; width:100%; }
+    .p1 .m-submit, .p2 .m-submit, .p4 .m-submit, .p5 .m-submit { background:#D42B2B; color:#fff; }
+    .p3 .m-submit { background:#111111; color:#fff; }
+
+    /* ── FOOTER ── */
+    .m-footer { background:#111111; border-top:2px solid var(--stripe); padding:12px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; }
+    .p4 .m-footer { background:#060606; }
+    .m-footer-logo { display:flex; align-items:center; gap:7px; }
+    .m-footer-logo img { width:22px; height:22px; border-radius:50%; object-fit:cover; }
+    .m-footer-brand { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:0.06em; color:#fff; line-height:1.1; }
+    .m-footer-sub { font-size:7px; color:rgba(255,255,255,0.25); letter-spacing:0.1em; text-transform:uppercase; }
+    .m-footer-links { display:flex; gap:10px; }
+    .m-footer-links span { font-size:7px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:rgba(255,255,255,0.25); }
+    .m-footer-copy { font-size:7px; color:rgba(255,255,255,0.14); letter-spacing:0.1em; text-transform:uppercase; }
+
+    /* ── SWATCHES ── */
+    .m-swatches { padding:12px 14px; background:var(--bg); border-top:1px solid var(--border); display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+    .swatch { width:16px; height:16px; }
+    .swatch-label { font-size:8px; color:var(--text-m); letter-spacing:0.08em; }
+    .swatch-group { display:flex; align-items:center; gap:4px; }
+
+    /* ── LÉGENDE ── */
+    .palette-meta { padding:14px 20px; background:#181818; border:1px solid #2a2a2a; border-top:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; }
+    .meta-item { display:flex; align-items:center; gap:6px; }
+    .meta-dot { width:10px; height:10px; flex-shrink:0; }
+    .meta-text { font-size:9px; color:#666; line-height:1.4; }
+    .meta-text strong { display:block; color:#aaa; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; }
+
+    @media (max-width: 1000px) { .palettes-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 640px)  { .palettes-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<div class="page-title">
+  <h1>MR Auto Canada — Palette Preview</h1>
+  <h2>5 Propositions de couleurs</h2>
+</div>
+
+<!-- ── MACRO TEMPLATE (répété 5 fois, seule la classe change) ── -->
+
+<div class="palettes-grid">
+
+<!-- ════════════ P1 — CANADA NOIR ════════════ -->
+<div class="palette-wrapper">
+  <div class="palette-label">
+    <div class="num">01</div>
+    <div class="name" style="color:#D42B2B;">Canada Noir</div>
+    <div class="desc">Dark mode anthracite. Le rouge tranche sur fond sombre.</div>
+  </div>
+  <div class="mockup p1">
+    <div class="m-nav"><div class="m-logo"><img src="logo.jpg" alt="logo"/></div><div class="m-nav-links"><span>Voitures</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><button class="m-nav-cta">⊕ WhatsApp</button></div>
+    <div class="m-hero"><div class="m-hero-left"><div class="m-hero-kicker">Dakar · Depuis 2020</div><div class="m-hero-h1">Le bon choix<br>de voiture<br>à Dakar.</div><div class="m-hero-sub">Papiers vérifiés, essai routier,<br>livraison — tout compris.</div><div class="m-hero-chips"><span class="m-chip">✓ Papiers</span><span class="m-chip">✓ Essai</span><span class="m-chip">✓ Livraison</span></div><div class="m-hero-btns"><button class="m-btn-primary">Voir le catalogue ↓</button><button class="m-btn-wa">⊕ WhatsApp</button></div></div><div class="m-hero-img"><div class="m-hero-img-stripe"></div></div></div>
+    <div class="m-stats"><div class="m-stat"><div class="m-stat-n">20+</div><div class="m-stat-l">Vendues</div></div><div class="m-stat"><div class="m-stat-n">6 ans</div><div class="m-stat-l">À Dakar</div></div><div class="m-stat"><div class="m-stat-n">100%</div><div class="m-stat-l">Livrés</div></div></div>
+    <div class="m-cards-section"><div class="m-section-header"><div class="m-section-kicker">Catalogue</div><div class="m-section-title">Voitures disponibles</div></div><div class="m-cards-grid"><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">BMW X5</div><div class="m-card-model">2019 · 62 000 km · Diesel</div><div class="m-card-price">18 500 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Range Rover</div><div class="m-card-model">2020 · 45 000 km</div><div class="m-card-price">32 000 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Mercedes</div><div class="m-card-model">2018 · 80 000 km · Diesel</div><div class="m-card-price">14 200 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div></div></div>
+    <div class="m-demarche"><div class="m-section-header"><div class="m-section-kicker">Démarche</div><div class="m-section-title">En 5 étapes, c'est plié.</div></div><div class="m-demarche-grid"><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">01</div><div class="m-step-title">Tu écris</div><div class="m-step-desc">WhatsApp ou formulaire.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">02</div><div class="m-step-title">Rendez-vous</div><div class="m-step-desc">On fixe une date.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">03</div><div class="m-step-title">Essai</div><div class="m-step-desc">Prends le volant.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">04</div><div class="m-step-title">Vérif.</div><div class="m-step-desc">Papiers, mécanique.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">05</div><div class="m-step-title">Tu repars</div><div class="m-step-desc">Livraison à domicile.</div></div></div></div></div>
+    <div class="m-proof"><div class="m-proof-left"><div class="m-proof-big">20+</div><div class="m-proof-title">Voitures livrées,<br>clients heureux.</div><div class="m-proof-sub">Chaque photo = un client livré.</div><button class="m-proof-btn">Voir les livraisons →</button></div><div class="m-proof-grid"><div class="m-proof-cell"><div class="m-proof-cell-img">BMW X5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Range<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Merc.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Chev.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi Q7<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Toyota<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">BMW S5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Evoque<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi A6<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div></div></div>
+    <div class="m-cta"><div class="m-cta-label">Allez, on en parle ?</div><div class="m-cta-h">Une voiture en tête ?<br>Écris-moi maintenant.</div><div class="m-cta-sub">Je réponds sous 1h, 7j/7.</div><div class="m-cta-btns"><button class="m-cta-btn-wa">⊕ WhatsApp</button><button class="m-cta-btn-ghost">☎ Appeler</button></div></div>
+    <div class="m-contact"><div class="m-contact-left"><div class="m-contact-kicker">Contact</div><div class="m-contact-title">Une question ?</div><div class="m-contact-sub">Je réponds personnellement. Aucun bot.</div><button class="m-cinfo-wa">⊕ +221 XX XXX XX XX</button><button class="m-cinfo-tel">☎ +221 XX XXX XX XX</button><div class="m-cinfo-addr"><strong>Dakar, Sénégal</strong>Lun–Sam 9h–19h</div></div><div class="m-contact-right"><div class="m-contact-stripe"></div><div class="m-contact-form"><div class="m-form-title">Envoie un message</div><div class="m-field"><div class="m-label">Ton nom</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Téléphone</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Voiture qui t'intéresse</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Budget</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Message</div><div class="m-textarea"></div></div><button class="m-submit">Envoyer →</button></div></div></div>
+    <div class="m-footer"><div class="m-footer-logo"><img src="logo.jpg" alt=""/><div><div class="m-footer-brand">MR Auto Canada</div><div class="m-footer-sub">Dakar · Depuis 2020</div></div></div><div class="m-footer-links"><span>Catalogue</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><div class="m-footer-copy">© 2026 MR AUTO CANADA</div></div>
+    <div class="m-swatches"><div class="swatch-group"><div class="swatch" style="background:#111111;border:1px solid #333"></div><span class="swatch-label">#111111</span></div><div class="swatch-group"><div class="swatch" style="background:#1A1A1A;border:1px solid #333"></div><span class="swatch-label">#1A1A1A</span></div><div class="swatch-group"><div class="swatch" style="background:#252525;border:1px solid #333"></div><span class="swatch-label">#252525</span></div><div class="swatch-group"><div class="swatch" style="background:#D42B2B"></div><span class="swatch-label">#D42B2B</span></div><div class="swatch-group"><div class="swatch" style="background:#FFFFFF;border:1px solid #333"></div><span class="swatch-label">#FFFFFF</span></div></div>
+  </div>
+  <div class="palette-meta"><div class="meta-item"><div class="meta-dot" style="background:#111111;border:1px solid #333"></div><div class="meta-text"><strong>Header + Nav</strong>#111111 Noir</div></div><div class="meta-item"><div class="meta-dot" style="background:#D42B2B"></div><div class="meta-text"><strong>Boutons CTA</strong>#D42B2B Rouge</div></div><div class="meta-item"><div class="meta-dot" style="background:#1A1A1A;border:1px solid #333"></div><div class="meta-text"><strong>Fond</strong>#1A1A1A Anthracite</div></div><div class="meta-item"><div class="meta-dot" style="background:#252525;border:1px solid #333"></div><div class="meta-text"><strong>Cartes</strong>#252525 Gris sombre</div></div></div>
+</div>
+
+<!-- ════════════ P2 — BLANC SPORT ════════════ -->
+<div class="palette-wrapper">
+  <div class="palette-label">
+    <div class="num">02</div>
+    <div class="name" style="color:#EEEEEE;">Blanc Sport</div>
+    <div class="desc">Propre, lisible, codes auto classiques. Nav noire, fond clair.</div>
+  </div>
+  <div class="mockup p2">
+    <div class="m-nav"><div class="m-logo"><img src="logo.jpg" alt="logo"/></div><div class="m-nav-links"><span>Voitures</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><button class="m-nav-cta">⊕ WhatsApp</button></div>
+    <div class="m-hero"><div class="m-hero-left"><div class="m-hero-kicker">Dakar · Depuis 2020</div><div class="m-hero-h1">Le bon choix<br>de voiture<br>à Dakar.</div><div class="m-hero-sub">Papiers vérifiés, essai routier,<br>livraison — tout compris.</div><div class="m-hero-chips"><span class="m-chip">✓ Papiers</span><span class="m-chip">✓ Essai</span><span class="m-chip">✓ Livraison</span></div><div class="m-hero-btns"><button class="m-btn-primary">Voir le catalogue ↓</button><button class="m-btn-wa">⊕ WhatsApp</button></div></div><div class="m-hero-img"><div class="m-hero-img-stripe"></div></div></div>
+    <div class="m-stats"><div class="m-stat"><div class="m-stat-n">20+</div><div class="m-stat-l">Vendues</div></div><div class="m-stat"><div class="m-stat-n">6 ans</div><div class="m-stat-l">À Dakar</div></div><div class="m-stat"><div class="m-stat-n">100%</div><div class="m-stat-l">Livrés</div></div></div>
+    <div class="m-cards-section"><div class="m-section-header"><div class="m-section-kicker">Catalogue</div><div class="m-section-title">Voitures disponibles</div></div><div class="m-cards-grid"><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">BMW X5</div><div class="m-card-model">2019 · 62 000 km · Diesel</div><div class="m-card-price">18 500 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Range Rover</div><div class="m-card-model">2020 · 45 000 km</div><div class="m-card-price">32 000 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Mercedes</div><div class="m-card-model">2018 · 80 000 km · Diesel</div><div class="m-card-price">14 200 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div></div></div>
+    <div class="m-demarche"><div class="m-section-header"><div class="m-section-kicker">Démarche</div><div class="m-section-title">En 5 étapes, c'est plié.</div></div><div class="m-demarche-grid"><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">01</div><div class="m-step-title">Tu écris</div><div class="m-step-desc">WhatsApp ou formulaire.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">02</div><div class="m-step-title">Rendez-vous</div><div class="m-step-desc">On fixe une date.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">03</div><div class="m-step-title">Essai</div><div class="m-step-desc">Prends le volant.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">04</div><div class="m-step-title">Vérif.</div><div class="m-step-desc">Papiers, mécanique.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">05</div><div class="m-step-title">Tu repars</div><div class="m-step-desc">Livraison à domicile.</div></div></div></div></div>
+    <div class="m-proof"><div class="m-proof-left"><div class="m-proof-big">20+</div><div class="m-proof-title">Voitures livrées,<br>clients heureux.</div><div class="m-proof-sub">Chaque photo = un client livré.</div><button class="m-proof-btn">Voir les livraisons →</button></div><div class="m-proof-grid"><div class="m-proof-cell"><div class="m-proof-cell-img">BMW X5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Range<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Merc.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Chev.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi Q7<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Toyota<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">BMW S5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Evoque<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi A6<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div></div></div>
+    <div class="m-cta"><div class="m-cta-label">Allez, on en parle ?</div><div class="m-cta-h">Une voiture en tête ?<br>Écris-moi maintenant.</div><div class="m-cta-sub">Je réponds sous 1h, 7j/7.</div><div class="m-cta-btns"><button class="m-cta-btn-wa">⊕ WhatsApp</button><button class="m-cta-btn-ghost">☎ Appeler</button></div></div>
+    <div class="m-contact"><div class="m-contact-left"><div class="m-contact-kicker">Contact</div><div class="m-contact-title">Une question ?</div><div class="m-contact-sub">Je réponds personnellement. Aucun bot.</div><button class="m-cinfo-wa">⊕ +221 XX XXX XX XX</button><button class="m-cinfo-tel">☎ +221 XX XXX XX XX</button><div class="m-cinfo-addr"><strong>Dakar, Sénégal</strong>Lun–Sam 9h–19h</div></div><div class="m-contact-right"><div class="m-contact-stripe"></div><div class="m-contact-form"><div class="m-form-title">Envoie un message</div><div class="m-field"><div class="m-label">Ton nom</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Téléphone</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Voiture qui t'intéresse</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Budget</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Message</div><div class="m-textarea"></div></div><button class="m-submit">Envoyer →</button></div></div></div>
+    <div class="m-footer"><div class="m-footer-logo"><img src="logo.jpg" alt=""/><div><div class="m-footer-brand">MR Auto Canada</div><div class="m-footer-sub">Dakar · Depuis 2020</div></div></div><div class="m-footer-links"><span>Catalogue</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><div class="m-footer-copy">© 2026 MR AUTO CANADA</div></div>
+    <div class="m-swatches"><div class="swatch-group"><div class="swatch" style="background:#111111"></div><span class="swatch-label">#111111</span></div><div class="swatch-group"><div class="swatch" style="background:#F7F7F7;border:1px solid #ddd"></div><span class="swatch-label">#F7F7F7</span></div><div class="swatch-group"><div class="swatch" style="background:#D42B2B"></div><span class="swatch-label">#D42B2B</span></div><div class="swatch-group"><div class="swatch" style="background:#FFFFFF;border:1px solid #ddd"></div><span class="swatch-label">#FFFFFF</span></div><div class="swatch-group"><div class="swatch" style="background:#666666"></div><span class="swatch-label">#666666</span></div></div>
+  </div>
+  <div class="palette-meta"><div class="meta-item"><div class="meta-dot" style="background:#111111"></div><div class="meta-text"><strong>Header + Nav</strong>#111111 Noir</div></div><div class="meta-item"><div class="meta-dot" style="background:#D42B2B"></div><div class="meta-text"><strong>Boutons CTA</strong>#D42B2B Rouge</div></div><div class="meta-item"><div class="meta-dot" style="background:#F7F7F7;border:1px solid #aaa"></div><div class="meta-text"><strong>Fond</strong>#F7F7F7 Blanc cassé</div></div><div class="meta-item"><div class="meta-dot" style="background:#FFFFFF;border:1px solid #aaa"></div><div class="meta-text"><strong>Cartes</strong>#FFFFFF Blanc pur</div></div></div>
+</div>
+
+<!-- ════════════ P3 — ROUGE DAKAR ════════════ -->
+<div class="palette-wrapper">
+  <div class="palette-label">
+    <div class="num">03</div>
+    <div class="name" style="color:#D42B2B;">Rouge Dakar</div>
+    <div class="desc">Audacieux. Le rouge prend la tête — rare et mémorable.</div>
+  </div>
+  <div class="mockup p3">
+    <div class="m-nav"><div class="m-logo"><img src="logo.jpg" alt="logo"/></div><div class="m-nav-links"><span>Voitures</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><button class="m-nav-cta">⊕ WhatsApp</button></div>
+    <div class="m-hero"><div class="m-hero-left"><div class="m-hero-kicker">Dakar · Depuis 2020</div><div class="m-hero-h1">Le bon choix<br>de voiture<br>à Dakar.</div><div class="m-hero-sub">Papiers vérifiés, essai routier,<br>livraison — tout compris.</div><div class="m-hero-chips"><span class="m-chip">✓ Papiers</span><span class="m-chip">✓ Essai</span><span class="m-chip">✓ Livraison</span></div><div class="m-hero-btns"><button class="m-btn-primary">Voir le catalogue ↓</button><button class="m-btn-wa">⊕ WhatsApp</button></div></div><div class="m-hero-img"><div class="m-hero-img-stripe"></div></div></div>
+    <div class="m-stats"><div class="m-stat"><div class="m-stat-n">20+</div><div class="m-stat-l">Vendues</div></div><div class="m-stat"><div class="m-stat-n">6 ans</div><div class="m-stat-l">À Dakar</div></div><div class="m-stat"><div class="m-stat-n">100%</div><div class="m-stat-l">Livrés</div></div></div>
+    <div class="m-cards-section"><div class="m-section-header"><div class="m-section-kicker">Catalogue</div><div class="m-section-title">Voitures disponibles</div></div><div class="m-cards-grid"><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">BMW X5</div><div class="m-card-model">2019 · 62 000 km · Diesel</div><div class="m-card-price">18 500 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Range Rover</div><div class="m-card-model">2020 · 45 000 km</div><div class="m-card-price">32 000 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Mercedes</div><div class="m-card-model">2018 · 80 000 km · Diesel</div><div class="m-card-price">14 200 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div></div></div>
+    <div class="m-demarche"><div class="m-section-header"><div class="m-section-kicker">Démarche</div><div class="m-section-title">En 5 étapes, c'est plié.</div></div><div class="m-demarche-grid"><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">01</div><div class="m-step-title">Tu écris</div><div class="m-step-desc">WhatsApp ou formulaire.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">02</div><div class="m-step-title">Rendez-vous</div><div class="m-step-desc">On fixe une date.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">03</div><div class="m-step-title">Essai</div><div class="m-step-desc">Prends le volant.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">04</div><div class="m-step-title">Vérif.</div><div class="m-step-desc">Papiers, mécanique.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">05</div><div class="m-step-title">Tu repars</div><div class="m-step-desc">Livraison à domicile.</div></div></div></div></div>
+    <div class="m-proof"><div class="m-proof-left"><div class="m-proof-big">20+</div><div class="m-proof-title">Voitures livrées,<br>clients heureux.</div><div class="m-proof-sub">Chaque photo = un client livré.</div><button class="m-proof-btn">Voir les livraisons →</button></div><div class="m-proof-grid"><div class="m-proof-cell"><div class="m-proof-cell-img">BMW X5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Range<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Merc.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Chev.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi Q7<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Toyota<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">BMW S5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Evoque<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi A6<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div></div></div>
+    <div class="m-cta"><div class="m-cta-label">Allez, on en parle ?</div><div class="m-cta-h">Une voiture en tête ?<br>Écris-moi maintenant.</div><div class="m-cta-sub">Je réponds sous 1h, 7j/7.</div><div class="m-cta-btns"><button class="m-cta-btn-wa">⊕ WhatsApp</button><button class="m-cta-btn-ghost">☎ Appeler</button></div></div>
+    <div class="m-contact"><div class="m-contact-left"><div class="m-contact-kicker">Contact</div><div class="m-contact-title">Une question ?</div><div class="m-contact-sub">Je réponds personnellement. Aucun bot.</div><button class="m-cinfo-wa">⊕ +221 XX XXX XX XX</button><button class="m-cinfo-tel">☎ +221 XX XXX XX XX</button><div class="m-cinfo-addr"><strong>Dakar, Sénégal</strong>Lun–Sam 9h–19h</div></div><div class="m-contact-right"><div class="m-contact-stripe"></div><div class="m-contact-form"><div class="m-form-title">Envoie un message</div><div class="m-field"><div class="m-label">Ton nom</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Téléphone</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Voiture qui t'intéresse</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Budget</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Message</div><div class="m-textarea"></div></div><button class="m-submit">Envoyer →</button></div></div></div>
+    <div class="m-footer"><div class="m-footer-logo"><img src="logo.jpg" alt=""/><div><div class="m-footer-brand">MR Auto Canada</div><div class="m-footer-sub">Dakar · Depuis 2020</div></div></div><div class="m-footer-links"><span>Catalogue</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><div class="m-footer-copy">© 2026 MR AUTO CANADA</div></div>
+    <div class="m-swatches"><div class="swatch-group"><div class="swatch" style="background:#D42B2B"></div><span class="swatch-label">#D42B2B</span></div><div class="swatch-group"><div class="swatch" style="background:#111111"></div><span class="swatch-label">#111111</span></div><div class="swatch-group"><div class="swatch" style="background:#FFFFFF;border:1px solid #ddd"></div><span class="swatch-label">#FFFFFF</span></div><div class="swatch-group"><div class="swatch" style="background:#FDF4F4;border:1px solid #ddd"></div><span class="swatch-label">#FDF4F4</span></div></div>
+  </div>
+  <div class="palette-meta"><div class="meta-item"><div class="meta-dot" style="background:#D42B2B"></div><div class="meta-text"><strong>Header + Nav</strong>#D42B2B Rouge logo</div></div><div class="meta-item"><div class="meta-dot" style="background:#111111"></div><div class="meta-text"><strong>Boutons CTA</strong>#111111 Noir</div></div><div class="meta-item"><div class="meta-dot" style="background:#FFFFFF;border:1px solid #aaa"></div><div class="meta-text"><strong>Fond</strong>#FFFFFF Blanc pur</div></div><div class="meta-item"><div class="meta-dot" style="background:#FDF4F4;border:1px solid #ddd"></div><div class="meta-text"><strong>Sections alt</strong>#FDF4F4 Rose pâle</div></div></div>
+</div>
+
+<!-- ════════════ P4 — CARBONE ROUGE (PREMIUM) ════════════ -->
+<div class="palette-wrapper">
+  <div class="palette-label">
+    <div class="num" style="color:#D42B2B;">04 · Premium</div>
+    <div class="name" style="color:#D42B2B;">Carbone Rouge</div>
+    <div class="desc">Pitch black ultra-profond. Rouge comme unique signal de vie.</div>
+  </div>
+  <div class="mockup p4">
+    <div class="m-nav"><div class="m-logo"><img src="logo.jpg" alt="logo"/></div><div class="m-nav-links"><span>Voitures</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><button class="m-nav-cta">⊕ WhatsApp</button></div>
+    <div class="m-hero"><div class="m-hero-left"><div class="m-hero-kicker">Dakar · Depuis 2020</div><div class="m-hero-h1">Le bon choix<br>de voiture<br>à Dakar.</div><div class="m-hero-sub">Papiers vérifiés, essai routier,<br>livraison — tout compris.</div><div class="m-hero-chips"><span class="m-chip">✓ Papiers</span><span class="m-chip">✓ Essai</span><span class="m-chip">✓ Livraison</span></div><div class="m-hero-btns"><button class="m-btn-primary">Voir le catalogue ↓</button><button class="m-btn-wa">⊕ WhatsApp</button></div></div><div class="m-hero-img"><div class="m-hero-img-stripe"></div></div></div>
+    <div class="m-stats"><div class="m-stat"><div class="m-stat-n">20+</div><div class="m-stat-l">Vendues</div></div><div class="m-stat"><div class="m-stat-n">6 ans</div><div class="m-stat-l">À Dakar</div></div><div class="m-stat"><div class="m-stat-n">100%</div><div class="m-stat-l">Livrés</div></div></div>
+    <div class="m-cards-section"><div class="m-section-header"><div class="m-section-kicker">Catalogue</div><div class="m-section-title">Voitures disponibles</div></div><div class="m-cards-grid"><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">BMW X5</div><div class="m-card-model">2019 · 62 000 km · Diesel</div><div class="m-card-price">18 500 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Range Rover</div><div class="m-card-model">2020 · 45 000 km</div><div class="m-card-price">32 000 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Mercedes</div><div class="m-card-model">2018 · 80 000 km · Diesel</div><div class="m-card-price">14 200 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div></div></div>
+    <div class="m-demarche"><div class="m-section-header"><div class="m-section-kicker">Démarche</div><div class="m-section-title">En 5 étapes, c'est plié.</div></div><div class="m-demarche-grid"><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">01</div><div class="m-step-title">Tu écris</div><div class="m-step-desc">WhatsApp ou formulaire.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">02</div><div class="m-step-title">Rendez-vous</div><div class="m-step-desc">On fixe une date.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">03</div><div class="m-step-title">Essai</div><div class="m-step-desc">Prends le volant.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">04</div><div class="m-step-title">Vérif.</div><div class="m-step-desc">Papiers, mécanique.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">05</div><div class="m-step-title">Tu repars</div><div class="m-step-desc">Livraison à domicile.</div></div></div></div></div>
+    <div class="m-proof"><div class="m-proof-left"><div class="m-proof-big">20+</div><div class="m-proof-title">Voitures livrées,<br>clients heureux.</div><div class="m-proof-sub">Chaque photo = un client livré.</div><button class="m-proof-btn">Voir les livraisons →</button></div><div class="m-proof-grid"><div class="m-proof-cell"><div class="m-proof-cell-img">BMW X5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Range<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Merc.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Chev.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi Q7<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Toyota<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">BMW S5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Evoque<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi A6<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div></div></div>
+    <div class="m-cta"><div class="m-cta-label">Allez, on en parle ?</div><div class="m-cta-h">Une voiture en tête ?<br>Écris-moi maintenant.</div><div class="m-cta-sub">Je réponds sous 1h, 7j/7.</div><div class="m-cta-btns"><button class="m-cta-btn-wa">⊕ WhatsApp</button><button class="m-cta-btn-ghost">☎ Appeler</button></div></div>
+    <div class="m-contact"><div class="m-contact-left"><div class="m-contact-kicker">Contact</div><div class="m-contact-title">Une question ?</div><div class="m-contact-sub">Je réponds personnellement. Aucun bot.</div><button class="m-cinfo-wa">⊕ +221 XX XXX XX XX</button><button class="m-cinfo-tel">☎ +221 XX XXX XX XX</button><div class="m-cinfo-addr"><strong>Dakar, Sénégal</strong>Lun–Sam 9h–19h</div></div><div class="m-contact-right"><div class="m-contact-stripe"></div><div class="m-contact-form"><div class="m-form-title">Envoie un message</div><div class="m-field"><div class="m-label">Ton nom</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Téléphone</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Voiture qui t'intéresse</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Budget</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Message</div><div class="m-textarea"></div></div><button class="m-submit">Envoyer →</button></div></div></div>
+    <div class="m-footer"><div class="m-footer-logo"><img src="logo.jpg" alt=""/><div><div class="m-footer-brand">MR Auto Canada</div><div class="m-footer-sub">Dakar · Depuis 2020</div></div></div><div class="m-footer-links"><span>Catalogue</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><div class="m-footer-copy">© 2026 MR AUTO CANADA</div></div>
+    <div class="m-swatches"><div class="swatch-group"><div class="swatch" style="background:#080808;border:1px solid #222"></div><span class="swatch-label">#080808</span></div><div class="swatch-group"><div class="swatch" style="background:#0D0D0D;border:1px solid #222"></div><span class="swatch-label">#0D0D0D</span></div><div class="swatch-group"><div class="swatch" style="background:#171717;border:1px solid #222"></div><span class="swatch-label">#171717</span></div><div class="swatch-group"><div class="swatch" style="background:#D42B2B"></div><span class="swatch-label">#D42B2B</span></div><div class="swatch-group"><div class="swatch" style="background:#F0F0F0;border:1px solid #333"></div><span class="swatch-label">#F0F0F0</span></div></div>
+  </div>
+  <div class="palette-meta"><div class="meta-item"><div class="meta-dot" style="background:#080808;border:1px solid #333"></div><div class="meta-text"><strong>Header + Nav</strong>#080808 Pitch black</div></div><div class="meta-item"><div class="meta-dot" style="background:#D42B2B"></div><div class="meta-text"><strong>Accent unique</strong>#D42B2B Rouge</div></div><div class="meta-item"><div class="meta-dot" style="background:#0D0D0D;border:1px solid #333"></div><div class="meta-text"><strong>Fond</strong>#0D0D0D Quasi-noir</div></div><div class="meta-item"><div class="meta-dot" style="background:#171717;border:1px solid #333"></div><div class="meta-text"><strong>Cartes</strong>#171717 Noir profond</div></div></div>
+</div>
+
+<!-- ════════════ P5 — BLANC ABSOLU (PREMIUM) ════════════ -->
+<div class="palette-wrapper">
+  <div class="palette-label">
+    <div class="num" style="color:#D42B2B;">05 · Premium</div>
+    <div class="name" style="color:#FFFFFF;">Blanc Absolu</div>
+    <div class="desc">Nav blanche logo seul. Minimalisme showroom luxe — rare dans l'auto.</div>
+  </div>
+  <div class="mockup p5">
+    <div class="m-nav"><div class="m-logo"><img src="logo.jpg" alt="logo"/></div><div class="m-nav-links"><span>Voitures</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><button class="m-nav-cta">⊕ WhatsApp</button></div>
+    <div class="m-hero"><div class="m-hero-left"><div class="m-hero-kicker">Dakar · Depuis 2020</div><div class="m-hero-h1">Le bon choix<br>de voiture<br>à Dakar.</div><div class="m-hero-sub">Papiers vérifiés, essai routier,<br>livraison — tout compris.</div><div class="m-hero-chips"><span class="m-chip">✓ Papiers</span><span class="m-chip">✓ Essai</span><span class="m-chip">✓ Livraison</span></div><div class="m-hero-btns"><button class="m-btn-primary">Voir le catalogue ↓</button><button class="m-btn-wa">⊕ WhatsApp</button></div></div><div class="m-hero-img"><div class="m-hero-img-stripe"></div></div></div>
+    <div class="m-stats"><div class="m-stat"><div class="m-stat-n">20+</div><div class="m-stat-l">Vendues</div></div><div class="m-stat"><div class="m-stat-n">6 ans</div><div class="m-stat-l">À Dakar</div></div><div class="m-stat"><div class="m-stat-n">100%</div><div class="m-stat-l">Livrés</div></div></div>
+    <div class="m-cards-section"><div class="m-section-header"><div class="m-section-kicker">Catalogue</div><div class="m-section-title">Voitures disponibles</div></div><div class="m-cards-grid"><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">BMW X5</div><div class="m-card-model">2019 · 62 000 km · Diesel</div><div class="m-card-price">18 500 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Range Rover</div><div class="m-card-model">2020 · 45 000 km</div><div class="m-card-price">32 000 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div><div class="m-card"><div class="m-card-img">PHOTO<div class="m-card-img-stripe"></div></div><div class="m-card-body"><div class="m-card-brand">Mercedes</div><div class="m-card-model">2018 · 80 000 km · Diesel</div><div class="m-card-price">14 200 000 FCFA</div><button class="m-card-btn">Voir →</button></div></div></div></div>
+    <div class="m-demarche"><div class="m-section-header"><div class="m-section-kicker">Démarche</div><div class="m-section-title">En 5 étapes, c'est plié.</div></div><div class="m-demarche-grid"><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">01</div><div class="m-step-title">Tu écris</div><div class="m-step-desc">WhatsApp ou formulaire.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">02</div><div class="m-step-title">Rendez-vous</div><div class="m-step-desc">On fixe une date.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">03</div><div class="m-step-title">Essai</div><div class="m-step-desc">Prends le volant.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">04</div><div class="m-step-title">Vérif.</div><div class="m-step-desc">Papiers, mécanique.</div></div></div><div class="m-step"><div class="m-step-stripe"></div><div class="m-step-body"><div class="m-step-num">05</div><div class="m-step-title">Tu repars</div><div class="m-step-desc">Livraison à domicile.</div></div></div></div></div>
+    <div class="m-proof"><div class="m-proof-left"><div class="m-proof-big">20+</div><div class="m-proof-title">Voitures livrées,<br>clients heureux.</div><div class="m-proof-sub">Chaque photo = un client livré.</div><button class="m-proof-btn">Voir les livraisons →</button></div><div class="m-proof-grid"><div class="m-proof-cell"><div class="m-proof-cell-img">BMW X5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Range<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Merc.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Chev.<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi Q7<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Toyota<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">BMW S5<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Evoque<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div><div class="m-proof-cell"><div class="m-proof-cell-img">Audi A6<div class="m-proof-cell-bar"></div></div><div class="m-proof-badge">VENDUE</div></div></div></div>
+    <div class="m-cta"><div class="m-cta-label">Allez, on en parle ?</div><div class="m-cta-h">Une voiture en tête ?<br>Écris-moi maintenant.</div><div class="m-cta-sub">Je réponds sous 1h, 7j/7.</div><div class="m-cta-btns"><button class="m-cta-btn-wa">⊕ WhatsApp</button><button class="m-cta-btn-ghost">☎ Appeler</button></div></div>
+    <div class="m-contact"><div class="m-contact-left"><div class="m-contact-kicker">Contact</div><div class="m-contact-title">Une question ?</div><div class="m-contact-sub">Je réponds personnellement. Aucun bot.</div><button class="m-cinfo-wa">⊕ +221 XX XXX XX XX</button><button class="m-cinfo-tel">☎ +221 XX XXX XX XX</button><div class="m-cinfo-addr"><strong>Dakar, Sénégal</strong>Lun–Sam 9h–19h</div></div><div class="m-contact-right"><div class="m-contact-stripe"></div><div class="m-contact-form"><div class="m-form-title">Envoie un message</div><div class="m-field"><div class="m-label">Ton nom</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Téléphone</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Voiture qui t'intéresse</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Budget</div><div class="m-input"></div></div><div class="m-field"><div class="m-label">Message</div><div class="m-textarea"></div></div><button class="m-submit">Envoyer →</button></div></div></div>
+    <div class="m-footer"><div class="m-footer-logo"><img src="logo.jpg" alt=""/><div><div class="m-footer-brand">MR Auto Canada</div><div class="m-footer-sub">Dakar · Depuis 2020</div></div></div><div class="m-footer-links"><span>Catalogue</span><span>Vendues</span><span>Démarche</span><span>Contact</span></div><div class="m-footer-copy">© 2026 MR AUTO CANADA</div></div>
+    <div class="m-swatches"><div class="swatch-group"><div class="swatch" style="background:#FFFFFF;border:1px solid #ddd"></div><span class="swatch-label">#FFFFFF</span></div><div class="swatch-group"><div class="swatch" style="background:#FAFAFA;border:1px solid #ddd"></div><span class="swatch-label">#FAFAFA</span></div><div class="swatch-group"><div class="swatch" style="background:#D42B2B"></div><span class="swatch-label">#D42B2B</span></div><div class="swatch-group"><div class="swatch" style="background:#111111"></div><span class="swatch-label">#111111</span></div><div class="swatch-group"><div class="swatch" style="background:#888888"></div><span class="swatch-label">#888888</span></div></div>
+  </div>
+  <div class="palette-meta"><div class="meta-item"><div class="meta-dot" style="background:#FFFFFF;border:1px solid #aaa"></div><div class="meta-text"><strong>Header + Nav</strong>#FFFFFF Blanc pur</div></div><div class="meta-item"><div class="meta-dot" style="background:#D42B2B"></div><div class="meta-text"><strong>Boutons + Accents</strong>#D42B2B Rouge</div></div><div class="meta-item"><div class="meta-dot" style="background:#FAFAFA;border:1px solid #aaa"></div><div class="meta-text"><strong>Fond</strong>#FAFAFA Blanc doux</div></div><div class="meta-item"><div class="meta-dot" style="background:#111111"></div><div class="meta-text"><strong>Texte + Footer</strong>#111111 Noir</div></div></div>
+</div>
+
+</div><!-- /palettes-grid -->
+
+<div style="text-align:center; margin-top:56px; color:#444; font-size:11px; letter-spacing:0.2em; text-transform:uppercase;">
+  Dis-moi ta palette — je l'applique au site complet.
+</div>
+
+</body>
+</html>

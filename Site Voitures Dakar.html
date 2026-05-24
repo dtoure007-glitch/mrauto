@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>MR Auto Canada — Voitures de qualité à Dakar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Vente de voitures de qualité à Dakar depuis 2020. Papiers vérifiés, essai routier, livraison à domicile." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); transition: background 0.4s, color 0.4s; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; outline: none; cursor: pointer; }
+
+    :root {
+      --bg:             #ffffff;
+      --bg-alt:         #f5f5f5;
+      --card-bg:        #ffffff;
+      --text:           #111111;
+      --text-muted:     rgba(17,17,17,0.48);
+      --accent:         #E2001A;
+      --accent-on-dark: #ff4d4d;
+      --accent-pale:    rgba(226,0,26,0.07);
+      --border:         rgba(17,17,17,0.1);
+      --chip-bg:        rgba(17,17,17,0.05);
+      --nav-bg:         rgba(255,255,255,0.97);
+      --font-display:   'Barlow Condensed', sans-serif;
+      --font-body:      'Barlow', sans-serif;
+      --radius:         0px;
+    }
+
+    #voitures, #demarche, #vendues, #contact { scroll-margin-top: 80px; }
+    .max-w { max-width: 1280px; margin: 0 auto; }
+    .sec   { padding: 88px 60px; }
+
+    /* Formulaire — thème clair */
+    .fi  { height: 46px; border: 1px solid var(--border); border-radius: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; padding: 0 14px; outline: none; width: 100%; transition: border-color 0.15s; }
+    .fi:focus  { border-color: var(--accent); }
+    .fi::placeholder { color: var(--text-muted); opacity: 0.7; }
+    .fta { height: 100px; border: 1px solid var(--border); border-radius: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; padding: 12px 14px; outline: none; width: 100%; resize: none; transition: border-color 0.15s; }
+    .fta:focus { border-color: var(--accent); }
+    .fta::placeholder { color: var(--text-muted); opacity: 0.7; }
+    .fl  { font-family: var(--font-body); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; display: block; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-grid      { grid-template-columns: 1fr !important; }
+      .hero-img       { min-height: 360px !important; height: 360px !important; }
+      .cars-grid      { grid-template-columns: repeat(2,1fr) !important; }
+      .demarche-grid  { grid-template-columns: repeat(3,1fr) !important; }
+      .proof-grid     { grid-template-columns: 1fr !important; }
+      .contact-grid   { grid-template-columns: 1fr !important; }
+      .stats-grid     { grid-template-columns: repeat(3,1fr) !important; }
+    }
+    @media (max-width: 640px) {
+      .sec            { padding: 60px 24px; }
+      .stats-grid     { grid-template-columns: 1fr !important; }
+      .cars-grid      { grid-template-columns: 1fr !important; }
+      .demarche-grid  { grid-template-columns: repeat(2,1fr) !important; }
+      .sold-grid      { grid-template-columns: repeat(2,1fr) !important; }
+    }
+
+    /* ── Page entry fade-in ──────────────────────────────── */
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #root { animation: pageFadeIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" src="tweaks-panel.jsx?v=3"></script>
+  <script type="text/babel" src="hifi-components.jsx?v=4"></script>
+
+  <script type="text/babel">
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "theme": "blanc-rouge",
+  "heroLayout": "split"
+}/*EDITMODE-END*/;
+
+// ── SUPABASE ───────────────────────────────────────────────────────────────
+const { createClient } = window.supabase;
+const sb = createClient(
+  'https://tunszuazffcniyaylxwj.supabase.co',
+  'sb_publishable_ORGOouzE5_jT5BCgqWLhKQ_Z3XnrPW7'
+);
+
+function useCars() {
+  const [cars, setCars] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    sb.from('cars')
+      .select('*')
+      .eq('status', 'available')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) setCars(data);
+        setLoading(false);
+      });
+  }, []);
+  return { cars, loading };
+}
+
+function useFeatured() {
+  const [featured, setFeatured] = React.useState(null);
+  React.useEffect(() => {
+    sb.from('cars').select('*').eq('featured', true).eq('status', 'available').limit(1)
+      .then(({ data }) => { if (data && data.length > 0) setFeatured(data[0]); });
+  }, []);
+  return featured;
+}
+
+
+function useSoldCars() {
+  const [soldCars, setSoldCars] = React.useState([]);
+  React.useEffect(() => {
+    sb.from('cars').select('*').eq('status', 'sold')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => { if (data) setSoldCars(data); });
+  }, []);
+  return soldCars;
+}
+
+
+// ── HERO CAROUSEL ─────────────────────────────────────────────────────────
+function HeroCarousel({ photos, alt }) {
+  const [idx, setIdx] = React.useState(0);
+  const [prev, setPrev] = React.useState(null);
+
+  React.useEffect(() => {
+    if (photos.length <= 1) return;
+    const t = setInterval(() => {
+      setIdx(i => {
+        setPrev(i);
+        return (i + 1) % photos.length;
+      });
+    }, 5000);
+    return () => clearInterval(t);
+  }, [photos.length]);
+
+  const goTo = (i) => {
+    setPrev(idx);
+    setIdx(i);
+  };
+
+  return (
+    <React.Fragment>
+      {photos.map((src, i) => (
+        <img
+          key={src + i}
+          src={src}
+          alt={alt}
+          style={{
+            position: 'absolute', inset: 0, width: '100%', height: '100%',
+            objectFit: 'cover', display: 'block',
+            opacity: i === idx ? 1 : 0,
+            transition: 'opacity 0.9s ease-in-out',
+            zIndex: i === idx ? 1 : 0,
+          }}
+        />
+      ))}
+      {photos.length > 1 && (
+        <div style={{
+          position: 'absolute', bottom: 16, left: 0, right: 0,
+          display: 'flex', justifyContent: 'center', gap: 6, zIndex: 4,
+        }}>
+          {photos.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              aria-label={`Photo ${i + 1}`}
+              style={{
+                width: i === idx ? 22 : 8, height: 8,
+                borderRadius: 0, border: 'none', padding: 0, cursor: 'pointer',
+                background: i === idx ? 'var(--accent)' : 'rgba(255,255,255,0.55)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                transition: 'width 0.35s ease, background 0.35s ease',
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </React.Fragment>
+  );
+}
+
+// ── HERO ──────────────────────────────────────────────────────────────────
+function HeroContent() {
+  const isMobile = useIsMobile();
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MStripe height={2} style={{ width: 20 }} />
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--accent)' }}>
+              Dakar, Sénégal · Depuis 2020
+            </span>
+          </div>
+
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(48px,6.5vw,96px)', fontWeight: 900, color: 'var(--text)', lineHeight: 0.93, letterSpacing: '0.01em', textTransform: 'uppercase', margin: 0 }}>
+            Le bon choix<br />de voiture<br />à Dakar.
+          </h1>
+
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: isMobile ? 14 : 16, color: 'var(--text-muted)', lineHeight: 1.72, maxWidth: 450, margin: 0 }}>
+            Depuis 2020, je sélectionne chaque voiture à la main.<br />Papiers vérifiés, essai routier, livraison — tout compris.
+          </p>
+
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {['✓ Papiers vérifiés', '✓ Essai gratuit', '✓ Livraison domicile'].map((t, i) =>
+        <span key={i} style={{ display: 'inline-flex', alignItems: 'center', padding: '6px 13px', borderRadius: 0, background: 'var(--accent-pale)', color: 'var(--text)', fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 500, border: '1px solid var(--border)', whiteSpace: 'nowrap' }}>{t}</span>
+        )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? 10 : 12, flexWrap: 'wrap' }}>
+            <HifiBtn variant="primary" size="lg" href="#voitures" full={isMobile}>Voir le catalogue ↓</HifiBtn>
+            <HifiBtn variant="whatsapp" size="lg" href="https://wa.me/221XXXXXXXXX" full={isMobile} style={{ gap: 8 }}>
+              <WaIcon size={16} /> WhatsApp
+            </HifiBtn>
+          </div>
+
+          <div style={{ fontFamily: 'var(--font-body)', fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+            Réponse en moins d'1h · 7j/7
+          </div>
+        </div>);
+
+}
+
+function HeroSection({ heroLayout, featuredCar }) {
+  const isMobile = useIsMobile();
+  const photos = React.useMemo(() => {
+    if (!featuredCar) return [];
+    const cover = featuredCar.cover_photo ? [featuredCar.cover_photo] : [];
+    const rest = (featuredCar.photos || []).filter(p => p && p !== featuredCar.cover_photo);
+    return [...cover, ...rest];
+  }, [featuredCar]);
+
+  const altText = featuredCar ? `${featuredCar.brand} ${featuredCar.model}` : 'voiture vedette';
+
+  if (heroLayout === 'fullbleed') {
+    return (
+      <section style={{ position: 'relative', minHeight: 'calc(100vh - 68px)', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+        {photos.length > 0
+          ? <HeroCarousel photos={photos} alt={altText} />
+          : <ImgPlaceholder label="voiture vedette — photo principale" overlay style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+        }
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.32) 65%, transparent 100%)', zIndex: 2 }} />
+        <div style={{ position: 'relative', zIndex: 3, padding: isMobile ? '88px 24px 48px' : '100px 80px', width: '100%', maxWidth: 820 }}>
+          <HeroContent />
+        </div>
+        <MStripe height={3} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 5 }} />
+      </section>
+    );
+  }
+
+  return (
+    <section className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 3fr', minHeight: 'calc(100vh - 68px)', paddingTop: 68 }}>
+      <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '80px 24px 48px' : '80px 64px 80px 68px', background: 'var(--bg)', borderRight: isMobile ? 'none' : '1px solid var(--border)' }}>
+        <div style={{ position: 'absolute', left: 0, top: '12%', height: '76%', width: 3, background: 'var(--accent)' }} />
+        <HeroContent />
+      </div>
+      <div className="hero-img" style={{ position: 'relative', overflow: 'hidden', minHeight: 480 }}>
+        {photos.length > 0
+          ? <HeroCarousel photos={photos} alt={altText} />
+          : <ImgPlaceholder label="voiture vedette — photo principale" overlay style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+        }
+        <MStripe height={3} style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 5 }} />
+      </div>
+    </section>
+  );
+}
+
+// ── STATS (fond sombre intentionnel — contraste fort) ─────────────────────
+function StatItem({ num, label, index }) {
+  const [ref, visible] = useScrollReveal();
+  const m = num.match(/^(\d+)(.*)/);
+  const target = m ? parseInt(m[1]) : 0;
+  const suffix = m ? m[2] : '';
+  const count = useCounter(target, 1400, visible);
+  return (
+    <div ref={ref} style={{
+      padding: '52px 40px', textAlign: 'center',
+      borderRight: index < 2 ? '1px solid rgba(255,255,255,0.08)' : 'none',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateY(20px)',
+      transition: `opacity 0.6s ease ${index * 200}ms, transform 0.6s ease ${index * 200}ms`,
+    }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: 80, fontWeight: 900, color: 'var(--accent-on-dark)', lineHeight: 1, letterSpacing: '-0.02em', textTransform: 'uppercase' }}>
+        {count}{suffix}
+      </div>
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'rgba(255,255,255,0.42)', marginTop: 10, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{label}</div>
+    </div>
+  );
+}
+
+function StatsSection() {
+  const stats = [['20+', 'voitures vendues'], ['6 ans', "d'expérience à Dakar"], ['100%', 'clients livrés']];
+  return (
+    <section style={{ background: '#111111' }}>
+      <MStripe height={2} />
+      <div className="max-w stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)' }}>
+        {stats.map(([n, l], i) => <StatItem key={i} num={n} label={l} index={i} />)}
+      </div>
+      <MStripe height={2} />
+    </section>);
+}
+
+// ── CATALOGUE ──────────────────────────────────────────────────────────────
+function CatalogueSection() {
+  const { cars, loading } = useCars();
+  const preview = cars.slice(0, 6);
+  const hasMore = cars.length > 6;
+  return (
+    <section id="voitures" className="sec" style={{ background: 'var(--bg)' }}>
+      <div className="max-w">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 44, flexWrap: 'wrap', gap: 16 }}>
+          <SectionHeader kicker="catalogue" title="Voitures disponibles" subtitle="Sélection mise à jour régulièrement." style={{ marginBottom: 0 }} />
+          <HifiBadge variant="live" style={{ marginBottom: 4 }}>● Mis à jour récemment</HifiBadge>
+        </div>
+        {loading
+          ? <div style={{ textAlign: 'center', padding: '60px 0', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Chargement du catalogue…</div>
+          : cars.length === 0
+            ? <div style={{ textAlign: 'center', padding: '60px 0', fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-muted)' }}>Aucune voiture disponible pour le moment.</div>
+            : <>
+                <div className="cars-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
+                  {preview.map((c, i) => <CarCard key={c.id} index={i} {...c} />)}
+                </div>
+                <div style={{ marginTop: 48, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 20 }}>
+                  <HifiBtn variant="primary" href="catalogue.html">
+                    Voir tout le catalogue {hasMore ? `(${cars.length} voitures)` : '→'}
+                  </HifiBtn>
+                  {hasMore && (
+                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
+                      {cars.length - 6} voiture{cars.length - 6 > 1 ? 's' : ''} de plus
+                    </span>
+                  )}
+                </div>
+              </>
+        }
+      </div>
+    </section>);
+}
+
+// ── DÉMARCHE ───────────────────────────────────────────────────────────────
+function DemarcheStep({ n, t, d, index }) {
+  const [ref, visible] = useScrollReveal();
+  return (
+    <div ref={ref} style={{
+      display: 'flex', flexDirection: 'column', overflow: 'hidden',
+      background: 'var(--card-bg)', border: '1px solid var(--border)',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateY(28px)',
+      transition: `opacity 0.55s cubic-bezier(0.22,1,0.36,1) ${index * 90}ms, transform 0.55s cubic-bezier(0.22,1,0.36,1) ${index * 90}ms, box-shadow 0.25s ease`,
+    }}
+    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.09)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
+      <MStripe height={3} />
+      <div style={{ padding: '24px 20px 28px' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 56, fontWeight: 900, lineHeight: 1, marginBottom: 14, letterSpacing: '-0.02em' }}
+          dangerouslySetInnerHTML={{ __html: `<span style="color:rgba(17,17,17,0.08)">${n}</span>` }} />
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 900, color: 'var(--text)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 1.05 }}>{t}</div>
+        <div style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.6 }}>{d}</div>
+      </div>
+    </div>
+  );
+}
+
+function DemarcheSection() {
+  const steps = [
+    ['01', 'Tu écris', 'WhatsApp ou formulaire — je réponds sous 1h.'],
+    ['02', 'Rendez-vous', 'On fixe une date au showroom, selon toi.'],
+    ['03', 'Essai routier', "Prends le volant, sans aucun engagement."],
+    ['04', 'Vérification', "Papiers, état mécanique — rien n'est caché."],
+    ['05', 'Tu repars', 'Livraison à domicile ou retrait sur place.'],
+  ];
+  return (
+    <section id="demarche" className="sec" style={{ background: 'var(--bg-alt)' }}>
+      <div className="max-w">
+        <SectionHeader kicker="démarche" title="En 5 étapes, c'est plié." align="center" style={{ marginBottom: 44 }} />
+        <div className="demarche-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 16 }}>
+          {steps.map(([n, t, d], i) => <DemarcheStep key={i} n={n} t={t} d={d} index={i} />)}
+        </div>
+      </div>
+    </section>);
+}
+
+// ── SOCIAL PROOF ───────────────────────────────────────────────────────────
+function SoldCarItem({ car, index }) {
+  const [ref, visible] = useScrollReveal();
+  const FALLBACK_BG = 'linear-gradient(140deg,#dcdcdc,#c8c8c8)';
+  return (
+    <div ref={ref} style={{
+      position: 'relative', overflow: 'hidden',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateY(24px)',
+      transition: `opacity 0.5s ease ${index * 60}ms, transform 0.5s ease ${index * 60}ms, box-shadow 0.25s ease`,
+    }}
+    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,0,0,0.13)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}>
+      {car.cover_photo
+        ? <img src={car.cover_photo} alt={`${car.brand} ${car.model}`} style={{ width: '100%', height: 160, objectFit: 'cover', display: 'block' }} />
+        : <div style={{ background: FALLBACK_BG, height: 160, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 9, letterSpacing: '0.14em', color: 'rgba(17,17,17,0.22)', textTransform: 'uppercase' }}>{car.brand} {car.model}</span>
+          </div>
+      }
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: 'var(--accent)' }} />
+      <div style={{ position: 'absolute', top: 8, left: 8, background: 'rgba(17,17,17,0.72)', color: '#fff', fontFamily: 'var(--font-body)', fontSize: 8, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', padding: '3px 7px' }}>VENDUE</div>
+    </div>
+  );
+}
+
+function SocialProofSection() {
+  const soldCars = useSoldCars();
+  return (
+    <section id="vendues" className="sec" style={{ background: 'var(--bg)' }}>
+      <div className="max-w proof-grid" style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: 72, alignItems: 'center' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+            <MStripe height={2} style={{ width: 20 }} />
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--accent)' }}>social proof</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(100px,12vw,168px)', fontWeight: 900, color: 'var(--accent)', lineHeight: 0.88, letterSpacing: '-0.03em', textTransform: 'uppercase', margin: '6px 0 18px' }}>20+</div>
+          <p style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 900, color: 'var(--text)', lineHeight: 1.1, textTransform: 'uppercase', marginBottom: 10 }}>voitures livrées,<br />20+ clients heureux.</p>
+          <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-muted)', lineHeight: 1.7, marginBottom: 28 }}>Chaque photo = un client livré, une transaction réussie. Aucune arnaque, aucun vice caché.</p>
+          <HifiBtn variant="outline" href="vendues.html">Voir toutes les livraisons →</HifiBtn>
+        </div>
+        <div className="sold-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
+          {soldCars.map((car, i) => <SoldCarItem key={car.id} car={car} index={i} />)}
+        </div>
+      </div>
+    </section>);
+}
+
+// ── CTA PUSH (fond sombre intentionnel) ────────────────────────────────────
+function CtaPushSection() {
+  const isMobile = useIsMobile();
+  return (
+    <section style={{ background: '#111111', padding: isMobile ? '0 24px' : '0 60px' }}>
+          <MStripe height={2} />
+          <div style={{ maxWidth: 780, margin: '0 auto', padding: '88px 0', textAlign: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 24 }}>
+              <MStripe height={2} style={{ width: 24 }} />
+              <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--accent-on-dark)' }}>allez, on en parle ?</span>
+              <MStripe height={2} style={{ width: 24 }} />
+            </div>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(44px,5vw,76px)', fontWeight: 900, color: '#fff', lineHeight: 0.95, textTransform: 'uppercase', letterSpacing: '0.01em', marginBottom: 22 }}>
+              Une voiture en tête ?<br />Écris-moi maintenant.
+            </h2>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 16, color: 'rgba(255,255,255,0.42)', lineHeight: 1.7, marginBottom: 38 }}>
+              Je réponds en moyenne sous 1h, 7j/7.<br />WhatsApp ou appel, selon ta préférence.
+            </p>
+            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <HifiBtn variant="whatsapp" size="lg" href="https://wa.me/221XXXXXXXXX" style={{ gap: 8 }}>
+                <WaIcon size={18} /> Écrire sur WhatsApp
+              </HifiBtn>
+              <HifiBtn variant="ghost" size="lg" href="tel:+221XXXXXXXXX">☎ Appeler</HifiBtn>
+            </div>
+          </div>
+          <MStripe height={2} />
+        </section>);
+
+}
+
+// ── CONTACT ────────────────────────────────────────────────────────────────
+function ContactSection() {
+  return (
+    <section id="contact" className="sec" style={{ background: 'var(--bg-alt)' }}>
+          <div className="max-w contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64 }}>
+            <div>
+              <SectionHeader kicker="contact" title="Une question ?" subtitle="Je réponds personnellement à chaque message. Aucun bot, que moi." style={{ marginBottom: 32 }} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <HifiBtn variant="whatsapp" size="md" href="https://wa.me/221XXXXXXXXX" full style={{ justifyContent: 'flex-start', gap: 10 }}>
+                  <WaIcon size={16} /> +221 XX XXX XX XX
+                </HifiBtn>
+                <HifiBtn variant="outline" size="md" href="tel:+221XXXXXXXXX" full style={{ justifyContent: 'flex-start', gap: 10 }}>
+                  ☎ +221 XX XXX XX XX
+                </HifiBtn>
+                <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 16px', border: '1px solid var(--border)' }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 900, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dakar, Sénégal</div>
+                    <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Sur rendez-vous · Lun–Sam 9h–19h</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <MStripe height={3} />
+              <div style={{ padding: 32 }}>
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 900, color: 'var(--text)', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Envoie-nous un message</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {[['Ton nom', 'text', 'iname'], ['Téléphone', 'tel', 'itel'], ["Voiture qui t'intéresse", 'text', 'icar'], ['Budget approximatif', 'text', 'ibudget']].map(([label, type, id]) =>
+              <div key={id}>
+                      <label className="fl" htmlFor={id}>{label}</label>
+                      <input id={id} type={type} className="fi" placeholder={label} />
+                    </div>
+              )}
+                  <div>
+                    <label className="fl" htmlFor="imsg">Message (optionnel)</label>
+                    <textarea id="imsg" className="fta" placeholder="Des précisions, des questions..."></textarea>
+                  </div>
+                  <HifiBtn variant="primary" full style={{ marginTop: 4 }}>Envoyer le message →</HifiBtn>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>);
+
+}
+
+// ── APP ────────────────────────────────────────────────────────────────────
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const featuredCar = useFeatured();
+
+  React.useEffect(() => {
+    const handleNav = (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (!href || href.startsWith('#') || href.startsWith('http') || href.startsWith('//') || href.startsWith('tel:') || href.startsWith('mailto:')) return;
+      e.preventDefault();
+      const root = document.getElementById('root');
+      root.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      root.style.opacity = '0';
+      root.style.transform = 'translateY(-8px)';
+      setTimeout(() => { window.location.href = href; }, 300);
+    };
+    document.addEventListener('click', handleNav);
+    return () => document.removeEventListener('click', handleNav);
+  }, []);
+
+  React.useEffect(() => {
+    const r = document.documentElement;
+    const themes = {
+      'blanc-rouge': {
+        '--bg': '#ffffff', '--bg-alt': '#f5f5f5', '--card-bg': '#ffffff',
+        '--text': '#111111', '--text-muted': 'rgba(17,17,17,0.48)',
+        '--accent': '#E2001A', '--accent-on-dark': '#ff4d4d', '--accent-pale': 'rgba(226,0,26,0.07)',
+        '--border': 'rgba(17,17,17,0.1)', '--chip-bg': 'rgba(17,17,17,0.05)',
+        '--nav-bg': 'rgba(255,255,255,0.97)'
+      },
+      'noir-rouge': {
+        '--bg': '#0e0e0e', '--bg-alt': '#191919', '--card-bg': '#1c1c1c',
+        '--text': '#f0f0f0', '--text-muted': 'rgba(240,240,240,0.45)',
+        '--accent': '#E2001A', '--accent-on-dark': '#ff4d4d', '--accent-pale': 'rgba(226,0,26,0.12)',
+        '--border': 'rgba(255,255,255,0.08)', '--chip-bg': 'rgba(255,255,255,0.06)',
+        '--nav-bg': 'rgba(14,14,14,0.97)'
+      },
+      'anthracite-rouge': {
+        '--bg': '#1a1a1a', '--bg-alt': '#242424', '--card-bg': '#222222',
+        '--text': '#e8e8e8', '--text-muted': 'rgba(232,232,232,0.45)',
+        '--accent': '#E2001A', '--accent-on-dark': '#ff4d4d', '--accent-pale': 'rgba(226,0,26,0.12)',
+        '--border': 'rgba(255,255,255,0.09)', '--chip-bg': 'rgba(255,255,255,0.06)',
+        '--nav-bg': 'rgba(26,26,26,0.97)'
+      }
+    };
+    const t = themes[tweaks.theme] || themes['blanc-rouge'];
+    Object.entries(t).forEach(([k, v]) => r.style.setProperty(k, v));
+  }, [tweaks.theme]);
+
+  return (
+    <React.Fragment>
+          <HifiNav />
+          <HeroSection heroLayout={tweaks.heroLayout} featuredCar={featuredCar} />
+          <StatsSection />
+          <CatalogueSection />
+          <DemarcheSection />
+          <SocialProofSection />
+          <CtaPushSection />
+          <ContactSection />
+          <HifiFooter />
+          <TweaksPanel>
+            <TweakSection title="Palette">
+              <TweakRadio id="theme" label="Couleur" value={tweaks.theme} onChange={(v) => setTweak('theme', v)}
+          options={[
+          { label: 'Blanc & Rouge', value: 'blanc-rouge' },
+          { label: 'Noir & Rouge', value: 'noir-rouge' },
+          { label: 'Anthracite & Rouge', value: 'anthracite-rouge' }]
+          } />
+            </TweakSection>
+            <TweakSection title="Hero">
+              <TweakRadio id="heroLayout" label="Layout" value={tweaks.heroLayout} onChange={(v) => setTweak('heroLayout', v)}
+          options={[{ label: 'Split', value: 'split' }, { label: 'Plein cadre', value: 'fullbleed' }]} />
+            </TweakSection>
+          </TweaksPanel>
+        </React.Fragment>);
+
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

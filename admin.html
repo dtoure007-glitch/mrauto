@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Admin — MR Auto Canada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f5f5f5; color: #111; font-family: 'Barlow', sans-serif; }
+    a { text-decoration: none; color: inherit; }
+    button { border: none; outline: none; cursor: pointer; font-family: 'Barlow', sans-serif; }
+    input, select, textarea { font-family: 'Barlow', sans-serif; }
+
+    :root {
+      --accent:     #E2001A;
+      --border:     rgba(17,17,17,0.1);
+      --text-muted: rgba(17,17,17,0.48);
+    }
+
+    /* Form inputs */
+    .fi { height: 42px; border: 1px solid var(--border); background: #fff; color: #111; font-size: 13px; padding: 0 12px; outline: none; width: 100%; transition: border-color 0.15s; border-radius: 0; }
+    .fi:focus { border-color: var(--accent); }
+    .fta { border: 1px solid var(--border); background: #fff; color: #111; font-size: 13px; padding: 10px 12px; outline: none; width: 100%; resize: vertical; transition: border-color 0.15s; border-radius: 0; min-height: 80px; }
+    .fta:focus { border-color: var(--accent); }
+    .fl { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; display: block; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f5f5f5; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .form-grid-2   { grid-template-columns: 1fr !important; }
+      .admin-toolbar { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+      .table-wrap    { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .admin-header-actions .hide-mobile { display: none !important; }
+    }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function useIsMobile(bp = 640) {
+      const [is, setIs] = React.useState(() => window.innerWidth <= bp);
+      React.useEffect(() => {
+        const h = () => setIs(window.innerWidth <= bp);
+        window.addEventListener('resize', h, { passive: true });
+        return () => window.removeEventListener('resize', h);
+      }, [bp]);
+      return is;
+    }
+
+    const { createClient } = window.supabase;
+    const sb = createClient(
+      'https://tunszuazffcniyaylxwj.supabase.co',
+      'sb_publishable_ORGOouzE5_jT5BCgqWLhKQ_Z3XnrPW7'
+    );
+
+    // ── BOUTON ADMIN ──────────────────────────────────────────────────────────
+    function Btn({ children, onClick, href, variant = 'primary', size = 'md', disabled = false, style = {} }) {
+      const sizes = { sm: { padding: '7px 14px', fontSize: 11 }, md: { padding: '10px 20px', fontSize: 12 }, lg: { padding: '13px 28px', fontSize: 13 } };
+      const variants = {
+        primary: { background: '#E2001A', color: '#fff' },
+        danger:  { background: '#c0392b', color: '#fff' },
+        ghost:   { background: 'transparent', color: '#111', border: '1px solid rgba(17,17,17,0.15)' },
+        green:   { background: '#25D366', color: '#fff' },
+        dark:    { background: '#111', color: '#fff' }
+      };
+      const v = variants[variant] || variants.primary;
+      const s = sizes[size] || sizes.md;
+      const base = { display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, borderRadius: 0, border: 'none', transition: 'opacity 0.15s', ...v, ...s, ...style };
+      const El = href ? 'a' : 'button';
+      return (
+        <El href={href} onClick={disabled ? undefined : onClick} style={base}
+          onMouseEnter={e => !disabled && (e.currentTarget.style.opacity = '0.8')}
+          onMouseLeave={e => !disabled && (e.currentTarget.style.opacity = '1')}>
+          {children}
+        </El>
+      );
+    }
+
+    // ── CONNEXION ─────────────────────────────────────────────────────────────
+    function LoginPage({ onLogin }) {
+      const [email, setEmail] = React.useState('');
+      const [pwd, setPwd] = React.useState('');
+      const [error, setError] = React.useState('');
+      const [loading, setLoading] = React.useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+        if (error) { setError('Email ou mot de passe incorrect.'); setLoading(false); }
+      };
+
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', padding: 24 }}>
+          <div style={{ width: '100%', maxWidth: 380, background: '#fff', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <div style={{ height: 3, background: '#E2001A' }} />
+            <div style={{ padding: 40, display: 'flex', flexDirection: 'column', gap: 28 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <img src="logo.jpg" alt="MR Auto" style={{ height: 48, width: 48, borderRadius: '50%', objectFit: 'cover' }} />
+                <div>
+                  <div style={{ fontFamily: 'Barlow Condensed', fontSize: 20, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.06em', lineHeight: 1 }}>MR Auto Canada</div>
+                  <div style={{ fontSize: 11, color: 'rgba(17,17,17,0.45)', letterSpacing: '0.1em', textTransform: 'uppercase', marginTop: 2 }}>Administration</div>
+                </div>
+              </div>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div>
+                  <label className="fl">Adresse email</label>
+                  <input type="email" className="fi" placeholder="admin@exemple.com" value={email} onChange={e => setEmail(e.target.value)} required />
+                </div>
+                <div>
+                  <label className="fl">Mot de passe</label>
+                  <input type="password" className="fi" placeholder="••••••••" value={pwd} onChange={e => setPwd(e.target.value)} required />
+                </div>
+                {error && <div style={{ fontSize: 12, color: '#E2001A', padding: '8px 12px', background: 'rgba(226,0,26,0.07)', border: '1px solid rgba(226,0,26,0.2)' }}>{error}</div>}
+                <Btn disabled={loading} style={{ marginTop: 4, justifyContent: 'center' }}>
+                  {loading ? 'Connexion…' : 'Se connecter →'}
+                </Btn>
+              </form>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── EN-TÊTE ADMIN ─────────────────────────────────────────────────────────
+    function AdminHeader({ email }) {
+      const handleLogout = () => sb.auth.signOut();
+      const isMobile = useIsMobile();
+      return (
+        <header style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: '#111', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ height: 2, background: '#E2001A' }} />
+          <div className="admin-header-actions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 32px', height: 62 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img src="logo.jpg" alt="MR Auto" style={{ height: 36, width: 36, borderRadius: '50%', objectFit: 'cover' }} />
+              <div style={{ fontFamily: 'Barlow Condensed', fontSize: 18, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Admin</div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Btn href="Site%20Voitures%20Dakar.html" variant="ghost" size="sm" style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.12)' }} className="hide-mobile">
+                Voir le site ↗
+              </Btn>
+              <Btn onClick={handleLogout} variant="ghost" size="sm" style={{ color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                {isMobile ? 'Quitter' : 'Déconnexion'}
+              </Btn>
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // ── MODAL AJOUT / ÉDITION ─────────────────────────────────────────────────
+    const EMPTY_FORM = { brand: '', model: '', year: '', price: '', km: '', fuel: 'Essence', transmission: 'Auto', color: '', badge: '', status: 'available', description: '', photos: [], cover_photo: '', featured: false };
+
+    function CarModal({ car, onClose, onSaved }) {
+      const [form, setForm] = React.useState(
+        car ? { ...car, photos: car.photos || [], badge: car.badge || '', cover_photo: car.cover_photo || '', featured: !!car.featured } : { ...EMPTY_FORM }
+      );
+      const [saving, setSaving] = React.useState(false);
+      const [uploading, setUploading] = React.useState(false);
+      const [error, setError] = React.useState('');
+      const fileInputRef = React.useRef(null);
+
+      const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+      const handleFiles = async (e) => {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        setUploading(true);
+        setError('');
+        const newUrls = [];
+        for (const file of files) {
+          const ext = file.name.split('.').pop();
+          const path = `cars/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+          const { error: upErr } = await sb.storage.from('voitures').upload(path, file, { cacheControl: '3600', upsert: false });
+          if (upErr) { setError('Erreur upload : ' + upErr.message); setUploading(false); return; }
+          const { data: urlData } = sb.storage.from('voitures').getPublicUrl(path);
+          newUrls.push(urlData.publicUrl);
+        }
+        setForm(f => ({ ...f, photos: [...f.photos, ...newUrls] }));
+        setUploading(false);
+        e.target.value = '';
+      };
+
+      const removePhoto = (idx) => setForm(f => {
+        const removed = f.photos[idx];
+        const next = f.photos.filter((_, i) => i !== idx);
+        return { ...f, photos: next, cover_photo: f.cover_photo === removed ? '' : f.cover_photo };
+      });
+
+      const setCover = (url) => setForm(f => ({ ...f, cover_photo: f.cover_photo === url ? '' : url }));
+
+      const handleSave = async () => {
+        if (!form.brand || !form.model || !form.year || !form.price || !form.km) {
+          setError('Complète les champs obligatoires.'); return;
+        }
+        setSaving(true);
+        setError('');
+        // Si cette voiture devient vedette, retirer le statut vedette des autres
+        if (form.featured) {
+          const q = sb.from('cars').update({ featured: false }).eq('featured', true);
+          if (car) await q.neq('id', car.id); else await q;
+        }
+        const data = {
+          brand: form.brand, model: form.model, year: form.year, price: form.price,
+          km: form.km, fuel: form.fuel, transmission: form.transmission, color: form.color,
+          badge: form.badge || null, status: form.status,
+          description: form.description || null,
+          photos: form.photos,
+          cover_photo: form.cover_photo || null,
+          featured: form.featured
+        };
+        let err;
+        if (car) {
+          ({ error: err } = await sb.from('cars').update(data).eq('id', car.id));
+        } else {
+          ({ error: err } = await sb.from('cars').insert([data]));
+        }
+        setSaving(false);
+        if (err) { setError('Erreur : ' + err.message); return; }
+        onSaved();
+      };
+
+      const Field = ({ label, children }) => (
+        <div>
+          <label className="fl">{label}</label>
+          {children}
+        </div>
+      );
+
+      return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 8px' }}
+          onClick={e => e.target === e.currentTarget && onClose()}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 640, maxHeight: '92vh', overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ height: 3, background: '#E2001A', flexShrink: 0 }} />
+            <div style={{ padding: '20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
+              <div style={{ fontFamily: 'Barlow Condensed', fontSize: 24, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {car ? 'Modifier la voiture' : 'Ajouter une voiture'}
+              </div>
+              <button onClick={onClose} style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, color: 'var(--text-muted)', cursor: 'pointer', background: 'none', border: '1px solid var(--border)' }}>×</button>
+            </div>
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto' }}>
+
+              <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Marque *"><input className="fi" value={form.brand} onChange={e => set('brand', e.target.value)} placeholder="BMW" /></Field>
+                <Field label="Modèle *"><input className="fi" value={form.model} onChange={e => set('model', e.target.value)} placeholder="X5" /></Field>
+                <Field label="Année *"><input className="fi" value={form.year} onChange={e => set('year', e.target.value)} placeholder="2020" /></Field>
+                <Field label="Prix *"><input className="fi" value={form.price} onChange={e => set('price', e.target.value)} placeholder="18 500 000 FCFA" /></Field>
+                <Field label="Kilométrage *"><input className="fi" value={form.km} onChange={e => set('km', e.target.value)} placeholder="62 000 km" /></Field>
+                <Field label="Couleur"><input className="fi" value={form.color} onChange={e => set('color', e.target.value)} placeholder="Noir" /></Field>
+                <Field label="Carburant">
+                  <select className="fi" value={form.fuel} onChange={e => set('fuel', e.target.value)}>
+                    {['Essence', 'Diesel', 'Hybride', 'Électrique'].map(f => <option key={f}>{f}</option>)}
+                  </select>
+                </Field>
+                <Field label="Transmission">
+                  <select className="fi" value={form.transmission} onChange={e => set('transmission', e.target.value)}>
+                    {['Auto', 'Manuelle'].map(t => <option key={t}>{t}</option>)}
+                  </select>
+                </Field>
+              </div>
+
+              <div className="form-grid-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Field label="Badge (optionnel)"><input className="fi" value={form.badge} onChange={e => set('badge', e.target.value)} placeholder="Nouveau, Coup de cœur…" /></Field>
+                <Field label="Statut">
+                  <select className="fi" value={form.status} onChange={e => set('status', e.target.value)}>
+                    <option value="available">Disponible</option>
+                    <option value="sold">Vendue</option>
+                  </select>
+                </Field>
+              </div>
+
+              <Field label="Description (optionnelle)">
+                <textarea className="fta" value={form.description} onChange={e => set('description', e.target.value)} placeholder="Historique, état, équipements…" style={{ minHeight: 80 }} />
+              </Field>
+
+              {/* ── VOITURE VEDETTE ───────────────────────────────────────── */}
+              <button
+                type="button"
+                onClick={() => set('featured', !form.featured)}
+                style={{ width: '100%', height: 56, display: 'flex', alignItems: 'center', gap: 14, padding: '0 18px', background: form.featured ? '#111' : '#fff', border: `2px solid ${form.featured ? '#111' : 'rgba(17,17,17,0.15)'}`, cursor: 'pointer', transition: 'all 0.15s', textAlign: 'left' }}
+                onMouseEnter={e => { if (!form.featured) e.currentTarget.style.borderColor = '#111'; }}
+                onMouseLeave={e => { if (!form.featured) e.currentTarget.style.borderColor = 'rgba(17,17,17,0.15)'; }}>
+                <span style={{ fontSize: 22, lineHeight: 1 }}>{form.featured ? '⭐' : '☆'}</span>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'Barlow Condensed', fontSize: 15, fontWeight: 900, letterSpacing: '0.06em', textTransform: 'uppercase', color: form.featured ? '#fff' : '#111', lineHeight: 1 }}>
+                    Voiture vedette
+                  </div>
+                  <div style={{ fontSize: 10, color: form.featured ? 'rgba(255,255,255,0.55)' : 'var(--text-muted)', letterSpacing: '0.06em', marginTop: 3 }}>
+                    {form.featured ? 'Affichée en image principale sur la page d\'accueil' : 'Cliquer pour mettre en avant sur la page d\'accueil'}
+                  </div>
+                </div>
+                {form.featured && (
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.2)', padding: '3px 8px', flexShrink: 0 }}>ACTIF</span>
+                )}
+              </button>
+
+              {/* ── PHOTOS ────────────────────────────────────────────────── */}
+              <Field label="Photos">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {form.photos.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {form.photos.map((url, i) => {
+                        const isCover = form.cover_photo === url;
+                        return (
+                          <div
+                            key={i}
+                            onClick={() => setCover(url)}
+                            title={isCover ? 'Photo de couverture — cliquer pour retirer' : 'Cliquer pour choisir comme couverture'}
+                            style={{ position: 'relative', width: 96, height: 72, flexShrink: 0, cursor: 'pointer', outline: isCover ? '3px solid #E2001A' : '3px solid transparent', outlineOffset: '-3px' }}>
+                            <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            <button
+                              onClick={e => { e.stopPropagation(); removePhoto(i); }}
+                              style={{ position: 'absolute', top: 4, right: 4, width: 20, height: 20, background: 'rgba(0,0,0,0.7)', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, lineHeight: 1, padding: 0 }}>×</button>
+                            {isCover && (
+                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: '#E2001A', color: '#fff', fontSize: 8, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', textAlign: 'center', padding: '2px 0' }}>
+                                Couverture
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFiles} style={{ display: 'none' }} />
+                  <button
+                    onClick={() => !uploading && fileInputRef.current.click()}
+                    disabled={uploading}
+                    style={{ height: 42, border: '1.5px dashed rgba(17,17,17,0.2)', background: uploading ? 'rgba(17,17,17,0.03)' : '#fff', color: uploading ? 'var(--text-muted)' : '#111', fontSize: 12, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', cursor: uploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, transition: 'border-color 0.15s', width: '100%' }}
+                    onMouseEnter={e => !uploading && (e.currentTarget.style.borderColor = '#E2001A')}
+                    onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(17,17,17,0.2)')}>
+                    {uploading ? '⏳ Envoi en cours…' : '+ Sélectionner des photos'}
+                  </button>
+                  {form.photos.length > 0 && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', letterSpacing: '0.06em' }}>
+                      {form.photos.length} photo{form.photos.length > 1 ? 's' : ''} · cliquer sur une photo = couverture · × = retirer
+                      {!form.cover_photo && <span style={{ color: '#E2001A', marginLeft: 8 }}>↑ Choisissez une photo de couverture</span>}
+                    </div>
+                  )}
+                </div>
+              </Field>
+
+              {error && <div style={{ fontSize: 12, color: '#E2001A', padding: '8px 12px', background: 'rgba(226,0,26,0.07)', border: '1px solid rgba(226,0,26,0.2)' }}>{error}</div>}
+
+              <div style={{ display: 'flex', gap: 10, paddingTop: 8 }}>
+                <Btn onClick={handleSave} disabled={saving || uploading} style={{ flex: 1, justifyContent: 'center' }}>
+                  {saving ? 'Enregistrement…' : car ? 'Enregistrer les modifications' : 'Ajouter la voiture'}
+                </Btn>
+                <Btn onClick={onClose} variant="ghost">Annuler</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── MODAL PRIX DE VENTE ───────────────────────────────────────────────────
+    function SellModal({ car, onClose, onConfirm }) {
+      const [prix, setPrix] = React.useState('');
+      const [saving, setSaving] = React.useState(false);
+
+      const handleConfirm = async () => {
+        setSaving(true);
+        await onConfirm(prix.trim() || null);
+      };
+
+      return (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          onClick={e => e.target === e.currentTarget && onClose()}>
+          <div style={{ background: '#fff', width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ height: 3, background: '#E2001A', flexShrink: 0 }} />
+            <div style={{ padding: '28px 32px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+              <div>
+                <div style={{ fontFamily: 'Barlow Condensed', fontSize: 22, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em', lineHeight: 1, marginBottom: 6 }}>
+                  Marquer comme vendue
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                  {car.brand} {car.model} {car.year}
+                </div>
+              </div>
+              <div>
+                <label className="fl">Prix de vente final</label>
+                <input
+                  className="fi"
+                  type="text"
+                  placeholder="ex: 17 800 000 FCFA"
+                  value={prix}
+                  onChange={e => setPrix(e.target.value)}
+                  autoFocus
+                  onKeyDown={e => e.key === 'Enter' && !saving && handleConfirm()}
+                />
+                <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 6, letterSpacing: '0.06em' }}>
+                  Laisser vide pour afficher le prix catalogue ({car.price}).
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 10 }}>
+                <Btn onClick={handleConfirm} disabled={saving} style={{ flex: 1, justifyContent: 'center' }}>
+                  {saving ? 'Enregistrement…' : 'Confirmer la vente'}
+                </Btn>
+                <Btn onClick={onClose} variant="ghost">Annuler</Btn>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ── TABLEAU DES VOITURES ──────────────────────────────────────────────────
+    function CarRow({ car, onEdit, onDelete, onMarkSold, onToggleStatus }) {
+      const [toggling, setToggling] = React.useState(false);
+      const thumb = car.cover_photo || (car.photos && car.photos[0]);
+
+      const handleRevertAvailable = async () => {
+        setToggling(true);
+        await onToggleStatus(car);
+        setToggling(false);
+      };
+
+      return (
+        <tr style={{ borderBottom: '1px solid var(--border)' }}>
+          <td style={{ padding: '12px 16px', width: 72 }}>
+            <div style={{ width: 64, height: 48, overflow: 'hidden', background: 'linear-gradient(150deg,#d8d8d8,#c4c4c4)', flexShrink: 0 }}>
+              {thumb && <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+            </div>
+          </td>
+          <td style={{ padding: '12px 16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontFamily: 'Barlow Condensed', fontSize: 18, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 1 }}>{car.brand} {car.model}</div>
+              {car.featured && <span title="Voiture vedette" style={{ fontSize: 14, lineHeight: 1 }}>⭐</span>}
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 3, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{car.year}</div>
+          </td>
+          <td style={{ padding: '12px 16px', fontSize: 14, fontWeight: 700, color: '#E2001A', whiteSpace: 'nowrap' }}>
+            {car.prix_vente || car.price}
+            {car.prix_vente && car.prix_vente !== car.price && (
+              <div style={{ fontSize: 10, fontWeight: 400, color: 'var(--text-muted)', marginTop: 2 }}>vendue · prix catalogue: {car.price}</div>
+            )}
+          </td>
+          <td style={{ padding: '12px 16px' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', padding: '3px 10px', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', background: car.status === 'available' ? 'rgba(37,211,102,0.12)' : 'rgba(17,17,17,0.06)', color: car.status === 'available' ? '#1a8a44' : 'var(--text-muted)' }}>
+              {car.status === 'available' ? '● Disponible' : '○ Vendue'}
+            </span>
+          </td>
+          <td style={{ padding: '12px 16px' }}>
+            <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap' }}>
+              <Btn size="sm" variant="ghost" onClick={() => onEdit(car)}>Éditer</Btn>
+              {car.status === 'available'
+                ? <Btn size="sm" variant="ghost" onClick={() => onMarkSold(car)}>Marquer vendue</Btn>
+                : <Btn size="sm" variant="ghost" onClick={handleRevertAvailable} disabled={toggling}>Remettre dispo</Btn>
+              }
+              <Btn size="sm" variant="danger" onClick={() => onDelete(car)}>Suppr.</Btn>
+            </div>
+          </td>
+        </tr>
+      );
+    }
+
+    // ── CARTE MOBILE ─────────────────────────────────────────────────────────
+    function CarCard({ car, onEdit, onDelete, onMarkSold, onToggleStatus }) {
+      const [toggling, setToggling] = React.useState(false);
+      const thumb = car.cover_photo || (car.photos && car.photos[0]);
+
+      const handleRevertAvailable = async () => {
+        setToggling(true);
+        await onToggleStatus(car);
+        setToggling(false);
+      };
+
+      return (
+        <div style={{ background: '#fff', border: '1px solid var(--border)', marginBottom: 10 }}>
+          <div style={{ display: 'flex', gap: 12, padding: 12 }}>
+            <div style={{ width: 84, height: 64, background: 'linear-gradient(150deg,#d8d8d8,#c4c4c4)', flexShrink: 0 }}>
+              {thumb && <img src={thumb} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ fontFamily: 'Barlow Condensed', fontSize: 18, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 1 }}>{car.brand} {car.model}</div>
+                {car.featured && <span style={{ fontSize: 13, lineHeight: 1 }}>⭐</span>}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{car.year}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#E2001A', marginTop: 5 }}>{car.prix_vente || car.price}</div>
+              <span style={{ display: 'inline-flex', alignItems: 'center', marginTop: 5, padding: '2px 8px', fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', background: car.status === 'available' ? 'rgba(37,211,102,0.12)' : 'rgba(17,17,17,0.06)', color: car.status === 'available' ? '#1a8a44' : 'var(--text-muted)' }}>
+                {car.status === 'available' ? '● Disponible' : '○ Vendue'}
+              </span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: '0 12px 12px' }}>
+            <Btn size="sm" variant="ghost" onClick={() => onEdit(car)} style={{ width: '100%', justifyContent: 'center' }}>Modifier</Btn>
+            {car.status === 'available'
+              ? <Btn size="sm" variant="dark" onClick={() => onMarkSold(car)} style={{ width: '100%', justifyContent: 'center' }}>Marquer vendue</Btn>
+              : <Btn size="sm" variant="ghost" onClick={handleRevertAvailable} disabled={toggling} style={{ width: '100%', justifyContent: 'center' }}>{toggling ? '…' : 'Remettre dispo'}</Btn>
+            }
+            <button onClick={() => onDelete(car)} style={{ background: 'none', border: 'none', fontSize: 11, color: '#c0392b', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', textAlign: 'center', padding: '4px 0', cursor: 'pointer' }}>Supprimer</button>
+          </div>
+        </div>
+      );
+    }
+
+    // ── DASHBOARD ─────────────────────────────────────────────────────────────
+    function Dashboard({ session }) {
+      const [cars, setCars] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const [modal, setModal] = React.useState(null);       // null | 'add' | car object
+      const [sellModalCar, setSellModalCar] = React.useState(null); // car to mark sold
+      const [filter, setFilter] = React.useState('all');
+      const isMobile = useIsMobile();
+
+      const fetchCars = async () => {
+        const { data } = await sb.from('cars').select('*').order('created_at', { ascending: false });
+        if (data) setCars(data);
+        setLoading(false);
+      };
+
+      React.useEffect(() => { fetchCars(); }, []);
+
+      const handleDelete = async (car) => {
+        if (!window.confirm(`Supprimer ${car.brand} ${car.model} ? Cette action est irréversible.`)) return;
+        await sb.from('cars').delete().eq('id', car.id);
+        setCars(c => c.filter(x => x.id !== car.id));
+      };
+
+      // available → sold: open SellModal first (prix_vente captured there)
+      // sold → available: toggle directly + clear prix_vente
+      const handleToggleStatus = async (car) => {
+        const update = { status: 'available', prix_vente: null };
+        if (car.featured) update.featured = false;
+        await sb.from('cars').update(update).eq('id', car.id);
+        setCars(c => c.map(x => x.id === car.id ? { ...x, ...update } : x));
+      };
+
+      const handleSellConfirm = async (prix_vente) => {
+        const car = sellModalCar;
+        const update = { status: 'sold', prix_vente: prix_vente || null };
+        if (car.featured) update.featured = false;
+        await sb.from('cars').update(update).eq('id', car.id);
+        setCars(c => c.map(x => x.id === car.id ? { ...x, ...update } : x));
+        setSellModalCar(null);
+      };
+
+      const handleSaved = () => { setModal(null); fetchCars(); };
+
+      const available = cars.filter(c => c.status === 'available').length;
+      const sold      = cars.filter(c => c.status === 'sold').length;
+      const shown     = filter === 'all' ? cars : cars.filter(c => c.status === filter);
+
+      return (
+        <>
+          <AdminHeader email={session.user.email} />
+          <main style={{ paddingTop: 62 }}>
+            <div style={{ maxWidth: 1100, margin: '0 auto', padding: isMobile ? '24px 16px' : '40px 32px' }}>
+
+              {/* Stats */}
+              <div style={{ display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
+                {[['Toutes', cars.length, 'all'], ['Disponibles', available, 'available'], ['Vendues', sold, 'sold']].map(([label, n, f]) => (
+                  <button key={f} onClick={() => setFilter(f)}
+                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 20px', background: filter === f ? '#111' : '#fff', color: filter === f ? '#fff' : '#111', border: `1px solid ${filter === f ? '#111' : 'var(--border)'}`, cursor: 'pointer', transition: 'all 0.15s', borderRadius: 0 }}>
+                    <span style={{ fontFamily: 'Barlow Condensed', fontSize: 28, fontWeight: 900, lineHeight: 1, color: filter === f ? '#fff' : '#E2001A' }}>{n}</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: filter === f ? 'rgba(255,255,255,0.7)' : 'var(--text-muted)' }}>{label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Toolbar */}
+              <div className="admin-toolbar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div style={{ fontFamily: 'Barlow Condensed', fontSize: 22, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  {filter === 'all' ? 'Toutes les voitures' : filter === 'available' ? 'Voitures disponibles' : 'Voitures vendues'}
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  {!isMobile && <Btn href="vendues.html" variant="ghost" size="sm">Voir vendues.html ↗</Btn>}
+                  <Btn onClick={() => setModal('add')}>+ Ajouter</Btn>
+                </div>
+              </div>
+
+              {/* Table / Cards */}
+              {loading
+                ? <div style={{ textAlign: 'center', padding: '60px 0', fontSize: 13, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Chargement…</div>
+                : shown.length === 0
+                  ? <div style={{ textAlign: 'center', padding: '60px 0', background: '#fff', border: '1px solid var(--border)', fontSize: 14, color: 'var(--text-muted)' }}>Aucune voiture dans cette catégorie.</div>
+                  : isMobile
+                    ? (
+                      <div>
+                        {shown.map(car => (
+                          <CarCard key={car.id} car={car}
+                            onEdit={setModal}
+                            onDelete={handleDelete}
+                            onMarkSold={setSellModalCar}
+                            onToggleStatus={handleToggleStatus} />
+                        ))}
+                      </div>
+                    )
+                    : (
+                      <div className="table-wrap" style={{ background: '#fff', border: '1px solid var(--border)', overflow: 'hidden' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 560 }}>
+                          <thead>
+                            <tr style={{ background: '#f5f5f5', borderBottom: '1px solid var(--border)' }}>
+                              {['', 'Voiture', 'Prix', 'Statut', 'Actions'].map(h => (
+                                <th key={h} style={{ padding: '10px 16px', textAlign: 'left', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', fontFamily: 'Barlow' }}>{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {shown.map(car => (
+                              <CarRow key={car.id} car={car}
+                                onEdit={setModal}
+                                onDelete={handleDelete}
+                                onMarkSold={setSellModalCar}
+                                onToggleStatus={handleToggleStatus} />
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )
+              }
+            </div>
+          </main>
+
+          {modal && (
+            <CarModal
+              car={modal === 'add' ? null : modal}
+              onClose={() => setModal(null)}
+              onSaved={handleSaved} />
+          )}
+
+          {sellModalCar && (
+            <SellModal
+              car={sellModalCar}
+              onClose={() => setSellModalCar(null)}
+              onConfirm={handleSellConfirm} />
+          )}
+        </>
+      );
+    }
+
+    // ── APP ───────────────────────────────────────────────────────────────────
+    function App() {
+      const [session, setSession] = React.useState(null);
+      const [checking, setChecking] = React.useState(true);
+
+      React.useEffect(() => {
+        sb.auth.getSession().then(({ data }) => {
+          setSession(data.session);
+          setChecking(false);
+        });
+        const { data: { subscription } } = sb.auth.onAuthStateChange((_, s) => setSession(s));
+        return () => subscription.unsubscribe();
+      }, []);
+
+      if (checking) return (
+        <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Chargement…</div>
+      );
+
+      if (!session) return <LoginPage />;
+      return <Dashboard session={session} />;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

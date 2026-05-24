@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Voitures vendues — MR Auto Canada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Toutes les voitures vendues par MR Auto Canada à Dakar. Chaque transaction, un client heureux." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: #f5f5f5; color: #111; font-family: 'Barlow', sans-serif; }
+    a { text-decoration: none; color: inherit; }
+
+    .sold-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    @media (max-width: 1024px) { .sold-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  {
+      .sold-grid { grid-template-columns: 1fr; }
+      .hero-btns { flex-direction: column !important; }
+      .hero-btns a { width: 100% !important; justify-content: center !important; }
+    }
+
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: none; }
+    }
+    #root { animation: pageFadeIn 0.45s cubic-bezier(0.22,1,0.36,1) both; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function useIsMobile(bp = 640) {
+      const [is, setIs] = React.useState(() => window.innerWidth <= bp);
+      React.useEffect(() => {
+        const h = () => setIs(window.innerWidth <= bp);
+        window.addEventListener('resize', h, { passive: true });
+        return () => window.removeEventListener('resize', h);
+      }, [bp]);
+      return is;
+    }
+
+    function useScrollReveal(threshold = 0.12) {
+      const ref = React.useRef(null);
+      const [visible, setVisible] = React.useState(false);
+      React.useEffect(() => {
+        const el = ref.current;
+        if (!el) return;
+        const obs = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) { setVisible(true); obs.unobserve(el); }
+        }, { threshold, rootMargin: '0px 0px -30px 0px' });
+        obs.observe(el);
+        return () => obs.disconnect();
+      }, []);
+      return [ref, visible];
+    }
+
+    const { createClient } = window.supabase;
+    const sb = createClient(
+      'https://tunszuazffcniyaylxwj.supabase.co',
+      'sb_publishable_ORGOouzE5_jT5BCgqWLhKQ_Z3XnrPW7'
+    );
+
+    function goBack(fallback) {
+      try {
+        if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
+          history.back(); return;
+        }
+      } catch(e) {}
+      window.location.href = fallback;
+    }
+
+    // ── WHATSAPP ICON ──────────────────────────────────────────────────────────
+    function WaIcon({ size = 16 }) {
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" style={{ flexShrink: 0 }}>
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+        </svg>
+      );
+    }
+
+    // ── BUTTON ─────────────────────────────────────────────────────────────────
+    function Btn({ children, href, onClick, variant = 'primary', size = 'md', style = {} }) {
+      const sizes = {
+        sm: { padding: '9px 18px', fontSize: 11 },
+        md: { padding: '13px 26px', fontSize: 12 },
+        lg: { padding: '17px 38px', fontSize: 13 }
+      };
+      const variants = {
+        primary:   { background: '#E2001A', color: '#fff', border: 'none' },
+        whatsapp:  { background: '#25D366', color: '#fff', border: 'none' },
+        outline:   { background: 'transparent', color: '#E2001A', border: '1.5px solid #E2001A' },
+        ghost:     { background: 'transparent', color: 'rgba(255,255,255,0.88)', border: '1.5px solid rgba(255,255,255,0.3)' },
+      };
+      const v = variants[variant] || variants.primary;
+      const s = sizes[size] || sizes.md;
+      const El = href ? 'a' : 'button';
+      return (
+        <El href={href} onClick={onClick} style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          gap: 8, cursor: 'pointer', borderRadius: 0, textDecoration: 'none',
+          fontFamily: 'Barlow, sans-serif', fontWeight: 700,
+          letterSpacing: '0.1em', textTransform: 'uppercase',
+          transition: 'opacity 0.15s',
+          ...v, ...s, ...style
+        }}
+          onMouseEnter={e => e.currentTarget.style.opacity = '0.8'}
+          onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+          {children}
+        </El>
+      );
+    }
+
+    // ── SOLD CARD ──────────────────────────────────────────────────────────────
+    function SoldCard({ car, index = 0 }) {
+      const [revealRef, revealed] = useScrollReveal();
+      const photos = React.useMemo(() => {
+        if (Array.isArray(car.photos) && car.photos.length > 0) return car.photos;
+        if (car.cover_photo) return [car.cover_photo];
+        return [];
+      }, [car]);
+
+      const [idx, setIdx] = React.useState(0);
+      const [imgOpacity, setImgOpacity] = React.useState(1);
+      const intervalRef = React.useRef(null);
+      const fadeRef = React.useRef(null);
+
+      React.useEffect(() => () => {
+        clearInterval(intervalRef.current);
+        clearTimeout(fadeRef.current);
+      }, []);
+
+      function handleEnter(e) {
+        e.currentTarget.style.transform = 'translateY(-4px)';
+        e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.12)';
+        if (photos.length <= 1) return;
+        intervalRef.current = setInterval(() => {
+          setImgOpacity(0);
+          fadeRef.current = setTimeout(() => {
+            setIdx(prev => (prev + 1) % photos.length);
+            setImgOpacity(1);
+          }, 220);
+        }, 1200);
+      }
+
+      function handleLeave(e) {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'none';
+        clearInterval(intervalRef.current);
+        clearTimeout(fadeRef.current);
+        if (photos.length > 1) {
+          setImgOpacity(0);
+          fadeRef.current = setTimeout(() => {
+            setIdx(0);
+            setImgOpacity(1);
+          }, 220);
+        }
+      }
+
+      const src = photos[idx] || null;
+      const displayPrice = car.prix_vente || car.price;
+
+      return (
+        <div ref={revealRef} style={{
+          opacity: revealed ? 1 : 0,
+          transform: revealed ? 'none' : 'translateY(32px)',
+          transition: `opacity 0.55s cubic-bezier(0.22,1,0.36,1) ${index * 70}ms, transform 0.55s cubic-bezier(0.22,1,0.36,1) ${index * 70}ms`,
+        }}>
+        <div style={{
+          background: '#fff',
+          border: '1px solid rgba(17,17,17,0.1)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          transition: 'transform 0.25s ease, box-shadow 0.25s ease'
+        }}
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}>
+
+          {/* Photo */}
+          <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0, background: 'linear-gradient(150deg,#d8d8d8,#c4c4c4)' }}>
+            {src
+              ? <img src={src} alt={`${car.brand} ${car.model}`} style={{
+                  width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                  opacity: imgOpacity, transition: 'opacity 0.22s ease'
+                }} />
+              : <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontFamily: 'Barlow, sans-serif', fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(17,17,17,0.25)' }}>{car.brand} {car.model}</span>
+                </div>
+            }
+            {/* VENDUE badge */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0,
+              background: '#E2001A', color: '#fff',
+              fontFamily: 'Barlow, sans-serif', fontSize: 9, fontWeight: 700,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              padding: '5px 11px', lineHeight: 1
+            }}>VENDUE</div>
+            {/* photo indicator dots — only when there are multiple photos */}
+            {photos.length > 1 && (
+              <div style={{
+                position: 'absolute', bottom: 12, left: 0, right: 0,
+                display: 'flex', justifyContent: 'center', gap: 5,
+                pointerEvents: 'none'
+              }}>
+                {photos.map((_, i) => (
+                  <div key={i} style={{
+                    width: 5, height: 5, borderRadius: '50%',
+                    background: i === idx ? '#fff' : 'rgba(255,255,255,0.4)',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                    transition: 'background 0.2s'
+                  }} />
+                ))}
+              </div>
+            )}
+            {/* bottom accent line */}
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: '#E2001A' }} />
+          </div>
+
+          {/* Body */}
+          <div style={{ padding: '18px 20px 22px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 24, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 1, color: '#111' }}>
+              {car.brand} {car.model}
+            </div>
+            <div style={{ fontFamily: 'Barlow, sans-serif', fontSize: 11, color: 'rgba(17,17,17,0.48)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{car.year}</div>
+            <div style={{ fontFamily: 'Barlow, sans-serif', fontSize: 17, fontWeight: 700, color: '#E2001A', letterSpacing: '0.02em', marginTop: 6 }}>
+              {displayPrice}
+            </div>
+          </div>
+        </div>
+        </div>
+      );
+    }
+
+    // ── PAGE ───────────────────────────────────────────────────────────────────
+    function Page() {
+      const [cars, setCars] = React.useState([]);
+      const [loading, setLoading] = React.useState(true);
+      const isMobile = useIsMobile();
+
+      React.useEffect(() => {
+        sb.from('cars')
+          .select('*')
+          .eq('status', 'sold')
+          .order('created_at', { ascending: false })
+          .then(({ data }) => {
+            if (data) setCars(data);
+            setLoading(false);
+          });
+      }, []);
+
+      return (
+        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+
+          {/* ── HEADER ──────────────────────────────────────────────────────── */}
+          <header style={{ background: '#111', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ height: 2, background: '#E2001A' }} />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 20px' : '0 48px', height: 68 }}>
+              <a href="Site%20Voitures%20Dakar.html" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <img src="logo.jpg" alt="MR Auto Canada" style={{ height: isMobile ? 36 : 44, width: isMobile ? 36 : 44, borderRadius: '50%', objectFit: 'cover' }} />
+                {!isMobile && <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 18, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>MR Auto Canada</div>}
+              </a>
+              <Btn onClick={() => goBack('Site%20Voitures%20Dakar.html#voitures')} variant="ghost" size="sm">
+                ← Catalogue
+              </Btn>
+            </div>
+          </header>
+
+          {/* ── HERO BANNER ─────────────────────────────────────────────────── */}
+          <div style={{ background: '#111', padding: isMobile ? '36px 20px 44px' : '56px 48px 60px' }}>
+            <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+                <div style={{ height: 2, width: 22, background: '#E2001A', flexShrink: 0 }} />
+                <span style={{ fontFamily: 'Barlow, sans-serif', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#E2001A' }}>livraisons</span>
+              </div>
+              <h1 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(36px,7vw,96px)', fontWeight: 900, color: '#fff', lineHeight: 0.92, textTransform: 'uppercase', letterSpacing: '0.01em', marginBottom: 22 }}>
+                Toutes nos<br />voitures vendues
+              </h1>
+              <p style={{ fontFamily: 'Barlow, sans-serif', fontSize: isMobile ? 13 : 15, color: 'rgba(255,255,255,0.42)', lineHeight: 1.7, maxWidth: 500, marginBottom: 36 }}>
+                Chaque voiture = une transaction réussie, un client livré.<br />Aucune arnaque, aucun vice caché.
+              </p>
+              <div className="hero-btns" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12, flexWrap: 'wrap' }}>
+                <Btn href="https://wa.me/221XXXXXXXXX" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center' } : {}}>
+                  <WaIcon size={16} /> Écrire sur WhatsApp
+                </Btn>
+                <Btn href="catalogue.html" variant="ghost" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center' } : {}}>
+                  Voir les voitures disponibles →
+                </Btn>
+              </div>
+            </div>
+          </div>
+
+          {/* ── GRID ────────────────────────────────────────────────────────── */}
+          <main style={{ flex: 1, padding: isMobile ? '32px 20px' : '60px 48px', background: '#f5f5f5' }}>
+            <div style={{ maxWidth: 1280, margin: '0 auto' }}>
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '80px 0', fontSize: 12, color: 'rgba(17,17,17,0.4)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+                  Chargement…
+                </div>
+              ) : cars.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '80px 0' }}>
+                  <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 30, fontWeight: 900, textTransform: 'uppercase', color: '#111', marginBottom: 14 }}>
+                    Aucune voiture vendue pour l'instant
+                  </div>
+                  <p style={{ fontFamily: 'Barlow, sans-serif', fontSize: 14, color: 'rgba(17,17,17,0.45)', marginBottom: 36 }}>
+                    Consultez les voitures disponibles dans notre catalogue.
+                  </p>
+                  <Btn href="catalogue.html" variant="primary">
+                    Voir les voitures disponibles
+                  </Btn>
+                </div>
+              ) : (
+                <>
+                  <div style={{ marginBottom: 32, fontFamily: 'Barlow, sans-serif', fontSize: 12, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(17,17,17,0.42)' }}>
+                    {cars.length} voiture{cars.length > 1 ? 's' : ''} vendue{cars.length > 1 ? 's' : ''}
+                  </div>
+                  <div className="sold-grid">
+                    {cars.map((car, i) => <SoldCard key={car.id} car={car} index={i} />)}
+                  </div>
+                </>
+              )}
+            </div>
+          </main>
+
+          {/* ── BOTTOM CTA ──────────────────────────────────────────────────── */}
+          <div style={{ background: '#111' }}>
+            <div style={{ height: 2, background: '#E2001A' }} />
+            <div style={{ maxWidth: 780, margin: '0 auto', padding: isMobile ? '56px 20px' : '88px 48px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+              <h2 style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 'clamp(32px,5vw,64px)', fontWeight: 900, color: '#fff', textTransform: 'uppercase', lineHeight: 0.95, letterSpacing: '0.01em' }}>
+                Votre prochain véhicule<br />vous attend.
+              </h2>
+              <p style={{ fontFamily: 'Barlow, sans-serif', fontSize: isMobile ? 13 : 15, color: 'rgba(255,255,255,0.38)', lineHeight: 1.7 }}>
+                Je réponds en moyenne sous 1h, 7j/7.<br />WhatsApp ou appel, selon ta préférence.
+              </p>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12, flexWrap: 'wrap', justifyContent: 'center', width: isMobile ? '100%' : 'auto' }}>
+                <Btn href="https://wa.me/221XXXXXXXXX" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center', width: '100%' } : {}}>
+                  <WaIcon size={18} /> Écrire sur WhatsApp
+                </Btn>
+                <Btn href="catalogue.html" variant="ghost" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center', width: '100%' } : {}}>
+                  Voir les voitures disponibles →
+                </Btn>
+              </div>
+            </div>
+          </div>
+
+          {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+          <footer style={{ background: '#111', borderTop: '1px solid rgba(255,255,255,0.06)', padding: isMobile ? '20px 24px' : '24px 48px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12, flex: 1, minWidth: 0 }}>
+              <img src="logo.jpg" alt="MR Auto Canada" style={{ height: isMobile ? 32 : 44, width: isMobile ? 32 : 44, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: isMobile ? 13 : 18, color: '#fff', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.1 }}>MR Auto Canada</div>
+                <div style={{ fontFamily: 'Barlow, sans-serif', fontSize: isMobile ? 8 : 10, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Dakar, Sénégal · Depuis 2020</div>
+              </div>
+            </div>
+            <div style={{ fontFamily: 'Barlow, sans-serif', fontSize: isMobile ? 8 : 11, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.08em', textTransform: 'uppercase', flexShrink: 0, whiteSpace: 'nowrap' }}>
+              © 2026 MR AUTO CANADA
+            </div>
+          </footer>
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Page />);
+  </script>
+</body>
+</html>
