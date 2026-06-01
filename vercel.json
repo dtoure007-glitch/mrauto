@@ -1,0 +1,22 @@
+{
+  "buildCommand": null,
+  "outputDirectory": ".",
+  "installCommand": null,
+  "framework": null,
+  "rewrites": [
+    { "source": "/voitures", "destination": "/Site%20Voitures%20Dakar.html" },
+    { "source": "/catalogue", "destination": "/catalogue.html" },
+    { "source": "/fiche", "destination": "/fiche.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/vendues", "destination": "/vendues.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    }
+  ]
+}
