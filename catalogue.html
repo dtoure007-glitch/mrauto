@@ -113,7 +113,7 @@
         }}>
           {scrolled && <MStripe height={2} />}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 20px' : '0 56px', height: 68 }}>
-            <a href="Site%20Voitures%20Dakar.html" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
+            <a href="index.html" style={{ display: 'flex', alignItems: 'center', gap: 12, textDecoration: 'none' }}>
               <img src="logo.jpg" alt="MRAUTO Canada" style={{ height: isMobile ? 36 : 48, width: isMobile ? 36 : 48, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
             </a>
             {isMobile ? (
@@ -126,12 +126,12 @@
             ) : (
               <>
                 <div style={{ display: 'flex', gap: 28 }}>
-                  <a href="Site%20Voitures%20Dakar.html"
-                    onClick={e => { e.preventDefault(); goBack('Site%20Voitures%20Dakar.html'); }}
+                  <a href="index.html"
+                    onClick={e => { e.preventDefault(); goBack('index.html'); }}
                     style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← Accueil</a>
-                  {[['Vendues', 'vendues.html'], ['Contact', 'Site%20Voitures%20Dakar.html#contact']].map(([l, h]) =>
+                  {[['Vendues', 'vendues.html'], ['Contact', 'index.html#contact']].map(([l, h]) =>
                     <a key={l} href={h} style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
                       onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
                       onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{l}</a>
@@ -145,12 +145,12 @@
           </div>
           {isMobile && open && (
             <div style={{ background: 'var(--nav-bg)', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
-              <a href="Site%20Voitures%20Dakar.html"
-                onClick={e => { e.preventDefault(); setOpen(false); goBack('Site%20Voitures%20Dakar.html'); }}
+              <a href="index.html"
+                onClick={e => { e.preventDefault(); setOpen(false); goBack('index.html'); }}
                 style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 ← Accueil
               </a>
-              {[['Vendues', 'vendues.html'], ['Contact', 'Site%20Voitures%20Dakar.html#contact']].map(([l, h]) => (
+              {[['Vendues', 'vendues.html'], ['Contact', 'index.html#contact']].map(([l, h]) => (
                 <a key={l} href={h} onClick={() => setOpen(false)}
                   style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                   {l}
