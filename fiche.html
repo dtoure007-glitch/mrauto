@@ -2,9 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Fiche voiture — MR Auto Canada</title>
+  <title>Fiche voiture — MRAUTO Canada</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Détail voiture MR Auto Canada — Dakar" />
+  <meta name="description" content="Détail voiture MRAUTO Canada — Dakar" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -138,7 +138,7 @@
               onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
               ← {isMobile ? 'Retour' : 'Catalogue'}
             </a>
-            <img src="logo.jpg" alt="MR Auto Canada" style={{ height: isMobile ? 36 : 40, width: isMobile ? 36 : 40, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center' }} />
+            <img src="logo.jpg" alt="MRAUTO Canada" style={{ height: isMobile ? 36 : 40, width: isMobile ? 36 : 40, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center' }} />
             <HifiBtn variant="whatsapp" size="sm" href="https://wa.me/221XXXXXXXXX" style={{ gap: 6 }}>
               <WaIcon size={13} /> {isMobile ? '' : 'WhatsApp'}
             </HifiBtn>
@@ -150,7 +150,7 @@
     // ── PAGE FICHE ────────────────────────────────────────────────────────────
     function FichePage({ car }) {
       const msg = encodeURIComponent(
-        `Bonjour MR Auto Canada, je suis intéressé(e) par la ${car.brand} ${car.model} ${car.year} à ${car.price}. Est-elle toujours disponible ?`
+        `Bonjour MRAUTO Canada, je suis intéressé(e) par la ${car.brand} ${car.model} ${car.year} à ${car.price}. Est-elle toujours disponible ?`
       );
 
       return (

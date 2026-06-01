@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>MR Auto Canada — Voitures de qualité à Dakar</title>
+  <title>MRAUTO Canada — Voitures de qualité à Dakar</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Vente de voitures de qualité à Dakar depuis 2020. Papiers vérifiés, essai routier, livraison à domicile." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -60,6 +60,7 @@
       .stats-grid     { grid-template-columns: 1fr !important; }
       .cars-grid      { grid-template-columns: 1fr !important; }
       .demarche-grid  { grid-template-columns: repeat(2,1fr) !important; }
+      .demarche-grid > :last-child { grid-column: 1 / -1; justify-self: center; width: calc(50% - 8px); }
       .sold-grid      { grid-template-columns: repeat(2,1fr) !important; }
     }
 
@@ -374,11 +375,11 @@ function DemarcheStep({ n, t, d, index }) {
 
 function DemarcheSection() {
   const steps = [
-    ['01', 'Tu écris', 'WhatsApp ou formulaire — je réponds sous 1h.'],
-    ['02', 'Rendez-vous', 'On fixe une date au showroom, selon toi.'],
-    ['03', 'Essai routier', "Prends le volant, sans aucun engagement."],
-    ['04', 'Vérification', "Papiers, état mécanique — rien n'est caché."],
-    ['05', 'Tu repars', 'Livraison à domicile ou retrait sur place.'],
+    ['01', 'Tu écris', "WhatsApp ou formulaire — tu auras ma réponse en moins d'1h."],
+    ['02', 'Rendez-vous', "On choisit ensemble un créneau qui t'arrange."],
+    ['03', 'Essai routier', "Tu prends le volant. Aucune pression, aucun engagement."],
+    ['04', 'Vérification', "On vérifie tout ensemble — papiers, mécanique. Zéro surprise."],
+    ['05', 'Tu repars', "Tu repars avec ta voiture — livraison à domicile ou retrait sur place."],
   ];
   return (
     <section id="demarche" className="sec" style={{ background: 'var(--bg-alt)' }}>
@@ -476,18 +477,12 @@ function ContactSection() {
             <div>
               <SectionHeader kicker="contact" title="Une question ?" subtitle="Je réponds personnellement à chaque message. Aucun bot, que moi." style={{ marginBottom: 32 }} />
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <HifiBtn variant="whatsapp" size="md" href="https://wa.me/221XXXXXXXXX" full style={{ justifyContent: 'flex-start', gap: 10 }}>
-                  <WaIcon size={16} /> +221 XX XXX XX XX
+                <HifiBtn variant="whatsapp" size="md" href="https://wa.me/221778346464" full style={{ justifyContent: 'flex-start', gap: 10 }}>
+                  <WaIcon size={16} /> +221 77 834 64 64
                 </HifiBtn>
-                <HifiBtn variant="outline" size="md" href="tel:+221XXXXXXXXX" full style={{ justifyContent: 'flex-start', gap: 10 }}>
-                  ☎ +221 XX XXX XX XX
+                <HifiBtn variant="outline" size="md" href="tel:+221778346464" full style={{ justifyContent: 'flex-start', gap: 10 }}>
+                  ☎ +221 77 834 64 64
                 </HifiBtn>
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '14px 16px', border: '1px solid var(--border)' }}>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font-display)', fontSize: 16, fontWeight: 900, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Dakar, Sénégal</div>
-                    <div style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Sur rendez-vous · Lun–Sam 9h–19h</div>
-                  </div>
-                </div>
               </div>
             </div>
             <div style={{ background: 'var(--card-bg)', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
