@@ -164,6 +164,15 @@
     // ── MODAL AJOUT / ÉDITION ─────────────────────────────────────────────────
     const EMPTY_FORM = { brand: '', model: '', year: '', price: '', km: '', fuel: 'Essence', transmission: 'Auto', color: '', badge: '', status: 'available', description: '', photos: [], cover_photo: '', featured: false };
 
+    function Field({ label, children }) {
+      return (
+        <div>
+          <label className="fl">{label}</label>
+          {children}
+        </div>
+      );
+    }
+
     function CarModal({ car, onClose, onSaved }) {
       const [form, setForm] = React.useState(
         car ? { ...car, photos: car.photos || [], badge: car.badge || '', cover_photo: car.cover_photo || '', featured: !!car.featured } : { ...EMPTY_FORM }
@@ -232,13 +241,6 @@
         if (err) { setError('Erreur : ' + err.message); return; }
         onSaved();
       };
-
-      const Field = ({ label, children }) => (
-        <div>
-          <label className="fl">{label}</label>
-          {children}
-        </div>
-      );
 
       return (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px 8px' }}
