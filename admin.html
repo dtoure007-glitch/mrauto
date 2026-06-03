@@ -212,7 +212,7 @@
       const setCover = (url) => setForm(f => ({ ...f, cover_photo: f.cover_photo === url ? '' : url }));
 
       const handleSave = async () => {
-        if (!form.brand || !form.model || !form.year || !form.price || !form.km) {
+        if (!form.brand || !form.model || !form.year || !form.price) {
           setError('Complète les champs obligatoires.'); return;
         }
         setSaving(true);
@@ -260,7 +260,7 @@
                 <Field label="Modèle *"><input className="fi" value={form.model} onChange={e => set('model', e.target.value)} placeholder="X5" /></Field>
                 <Field label="Année *"><input className="fi" value={form.year} onChange={e => set('year', e.target.value)} placeholder="2020" /></Field>
                 <Field label="Prix *"><input className="fi" value={form.price} onChange={e => set('price', e.target.value)} placeholder="18 500 000 FCFA" /></Field>
-                <Field label="Kilométrage *"><input className="fi" value={form.km} onChange={e => set('km', e.target.value)} placeholder="62 000 km" /></Field>
+                <Field label="Kilométrage"><input className="fi" value={form.km} onChange={e => set('km', e.target.value)} placeholder="62 000 km" /></Field>
                 <Field label="Couleur"><input className="fi" value={form.color} onChange={e => set('color', e.target.value)} placeholder="Noir" /></Field>
                 <Field label="Carburant">
                   <select className="fi" value={form.fuel} onChange={e => set('fuel', e.target.value)}>
