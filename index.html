@@ -394,6 +394,31 @@ function DemarcheSection() {
 }
 
 // ── SOCIAL PROOF ───────────────────────────────────────────────────────────
+function SoldCarPlaceholder({ index }) {
+  const [ref, visible] = useScrollReveal();
+  return (
+    <div ref={ref} style={{
+      position: 'relative', overflow: 'hidden',
+      background: '#f0f0f0',
+      height: 160,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: 10,
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateY(24px)',
+      transition: `opacity 0.5s ease ${index * 80}ms, transform 0.5s ease ${index * 80}ms`,
+    }}>
+      <svg width="52" height="30" viewBox="0 0 52 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 22H48M4 22L7 13L12 8H40L45 13L48 22H4Z" stroke="#c8c8c8" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+        <path d="M14 13L17 8H35L38 13H14Z" stroke="#c8c8c8" strokeWidth="1.5" strokeLinejoin="round"/>
+        <circle cx="14" cy="24" r="3" stroke="#c8c8c8" strokeWidth="2"/>
+        <circle cx="38" cy="24" r="3" stroke="#c8c8c8" strokeWidth="2"/>
+      </svg>
+      <span style={{ fontFamily: 'var(--font-body)', fontSize: 9, letterSpacing: '0.14em', color: '#c0c0c0', textTransform: 'uppercase' }}>Livraison à venir…</span>
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 2, background: '#e0e0e0' }} />
+    </div>
+  );
+}
+
 function SoldCarItem({ car, index }) {
   const [ref, visible] = useScrollReveal();
   const FALLBACK_BG = 'linear-gradient(140deg,#dcdcdc,#c8c8c8)';
@@ -434,7 +459,10 @@ function SocialProofSection() {
           <HifiBtn variant="outline" href="vendues.html">Voir toutes les livraisons →</HifiBtn>
         </div>
         <div className="sold-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
-          {soldCars.map((car, i) => <SoldCarItem key={car.id} car={car} index={i} />)}
+          {soldCars.length === 0
+            ? [0, 1, 2].map(i => <SoldCarPlaceholder key={i} index={i} />)
+            : soldCars.map((car, i) => <SoldCarItem key={car.id} car={car} index={i} />)
+          }
         </div>
       </div>
     </section>);
