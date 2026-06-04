@@ -104,15 +104,13 @@
 
       React.useEffect(() => { if (!isMobile) setOpen(false); }, [isMobile]);
 
-      const navBg = scrolled || open;
       return (
         <nav style={{
           position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
           display: 'flex', flexDirection: 'column',
-          background: navBg ? 'var(--nav-bg)' : 'transparent',
-          backdropFilter: navBg ? 'blur(20px)' : 'none',
-          borderBottom: navBg ? '1px solid var(--border)' : 'none',
-          transition: 'background 0.3s ease, border-color 0.3s ease'
+          background: 'var(--nav-bg)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid var(--border)'
         }}>
           {scrolled && <MStripe height={2} />}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 20px' : '0 56px', height: 68 }}>
