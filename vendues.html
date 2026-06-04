@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="preload" as="image" href="logo.jpg" />
+  <link rel="preconnect" href="https://tunszuazffcniyaylxwj.supabase.co" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -193,7 +195,12 @@
           {/* Photo */}
           <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0, background: 'linear-gradient(150deg,#d8d8d8,#c4c4c4)' }}>
             {src
-              ? <img src={src} alt={`${car.brand} ${car.model}`} style={{
+              ? <img src={src} alt={`${car.brand} ${car.model}`}
+                  loading={index < 3 ? "eager" : "lazy"}
+                  fetchPriority={index === 0 ? "high" : "auto"}
+                  decoding="async"
+                  width="800" height="220"
+                  style={{
                   width: '100%', height: '100%', objectFit: 'cover', display: 'block',
                   opacity: imgOpacity, transition: 'opacity 0.22s ease'
                 }} />
@@ -270,7 +277,7 @@
             <div style={{ height: 2, background: '#E2001A' }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 20px' : '0 48px', height: 68 }}>
               <a href="index.html" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <img src="logo.jpg" alt="MRAUTO Canada" style={{ height: isMobile ? 36 : 44, width: isMobile ? 36 : 44, borderRadius: '50%', objectFit: 'cover' }} />
+                <img src="logo.jpg" alt="MRAUTO Canada" width="44" height="44" fetchPriority="high" style={{ height: isMobile ? 36 : 44, width: isMobile ? 36 : 44, borderRadius: '50%', objectFit: 'cover' }} />
                 {!isMobile && <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 18, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>MRAUTO Canada</div>}
               </a>
               <Btn onClick={() => goBack('index.html#voitures')} variant="ghost" size="sm">
@@ -359,7 +366,7 @@
           {/* ── FOOTER ──────────────────────────────────────────────────────── */}
           <footer style={{ background: '#111', borderTop: '1px solid rgba(255,255,255,0.06)', padding: isMobile ? '20px 24px' : '24px 48px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12, flex: 1, minWidth: 0 }}>
-              <img src="logo.jpg" alt="MRAUTO Canada" style={{ height: isMobile ? 32 : 44, width: isMobile ? 32 : 44, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
+              <img src="logo.jpg" alt="MRAUTO Canada" loading="lazy" width="44" height="44" style={{ height: isMobile ? 32 : 44, width: isMobile ? 32 : 44, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: isMobile ? 13 : 18, color: '#fff', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.1 }}>MRAUTO Canada</div>
                 <div style={{ fontFamily: 'Barlow, sans-serif', fontSize: isMobile ? 8 : 10, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Dakar, Sénégal · Depuis 2020</div>

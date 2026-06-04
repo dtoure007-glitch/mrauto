@@ -209,7 +209,12 @@ function CarCard({ id, index = 0, brand, model, year, price, km, fuel, transmiss
         }}>
         <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0 }}>
           {cover_photo
-            ? <img src={cover_photo} alt={`${brand} ${model}`} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            ? <img src={cover_photo} alt={`${brand} ${model}`}
+                loading={index < 3 ? "eager" : "lazy"}
+                fetchPriority={index === 0 ? "high" : "auto"}
+                decoding="async"
+                width="800" height="220"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             : <ImgPlaceholder bg={CAR_GRADIENTS[index % CAR_GRADIENTS.length]} label={`${brand} ${model}`} style={{ height: 220 }} />
           }
           <MStripe height={2} style={{ position: 'absolute', bottom: 0, left: 0, right: 0 }} />
@@ -305,6 +310,7 @@ function HifiNav() {
       {scrolled && <MStripe height={2} />}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 20px' : '0 56px', height: 68 }}>
         <img src="logo.jpg" alt="MRAUTO Canada"
+          width="48" height="48" fetchPriority="high"
           style={{ height: isMobile ? 40 : 48, width: isMobile ? 40 : 48, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
 
         {isMobile ? (
@@ -365,7 +371,9 @@ function HifiFooter() {
       <div style={{ padding: isMobile ? '32px 24px' : '44px 60px', display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 8 : 0 }}>
         {/* Logo — flex:1 anchors the left third */}
         <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 8 : 12, flex: 1, minWidth: 0 }}>
-          <img src="logo.jpg" alt="MRAUTO Canada" style={{ height: isMobile ? 36 : 52, width: isMobile ? 36 : 52, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
+          <img src="logo.jpg" alt="MRAUTO Canada"
+            loading="lazy" width="52" height="52"
+            style={{ height: isMobile ? 36 : 52, width: isMobile ? 36 : 52, borderRadius: '50%', objectFit: 'cover', objectPosition: 'center', display: 'block', flexShrink: 0 }} />
           <div style={{ minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: isMobile ? 13 : 20, color: '#fff', fontWeight: 900, letterSpacing: '0.08em', textTransform: 'uppercase', lineHeight: 1.1 }}>MRAUTO Canada</div>
             <div style={{ fontFamily: 'var(--font-body)', fontSize: isMobile ? 8 : 11, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>Dakar, Sénégal · Depuis 2020</div>
