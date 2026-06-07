@@ -129,8 +129,11 @@ function HifiBtn({ children, variant = 'primary', size = 'md', href, onClick, st
     accent: { background: 'var(--accent)', color: '#fff', border: 'none' }
   }[variant] || {};
   const El = href ? 'a' : 'button';
+  const isExternal = href && (href.startsWith('https://') || href.startsWith('tel:'));
   return (
     <El href={href} onClick={onClick}
+    target={isExternal ? '_blank' : undefined}
+    rel={isExternal ? 'noopener noreferrer' : undefined}
     style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
       gap: 8, width: full ? '100%' : undefined, cursor: 'pointer',
@@ -240,7 +243,7 @@ function CarCard({ id, index = 0, brand, model, year, price, km, fuel, transmiss
           </div>
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8, marginTop: 4 }}>
             <HifiBtn variant="outline" size="sm" href={id ? `fiche.html?id=${id}` : '#'} style={{ flex: 1 }}>Voir la fiche</HifiBtn>
-            <HifiBtn variant="whatsapp" size="sm" href={`https://wa.me/221XXXXXXXXX?text=${msg}`} style={{ flex: 1, gap: 6 }}>
+            <HifiBtn variant="whatsapp" size="sm" href={`https://wa.me/221778346464?text=${msg}`} style={{ flex: 1, gap: 6 }}>
               <WaIcon size={13} /> WhatsApp
             </HifiBtn>
           </div>
@@ -329,7 +332,7 @@ function HifiNav() {
                   onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{l}</a>
               )}
             </div>
-            <HifiBtn variant="whatsapp" size="sm" href="https://wa.me/221XXXXXXXXX" style={{ gap: 6 }}>
+            <HifiBtn variant="whatsapp" size="sm" href="https://wa.me/221778346464" style={{ gap: 6 }}>
               <WaIcon size={13} /> WhatsApp
             </HifiBtn>
           </>
@@ -345,7 +348,7 @@ function HifiNav() {
             </a>
           ))}
           <div style={{ padding: '16px 20px' }}>
-            <HifiBtn variant="whatsapp" href="https://wa.me/221XXXXXXXXX" full style={{ gap: 8 }}>
+            <HifiBtn variant="whatsapp" href="https://wa.me/221778346464" full style={{ gap: 8 }}>
               <WaIcon size={15} /> WhatsApp
             </HifiBtn>
           </div>

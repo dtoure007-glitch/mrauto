@@ -115,8 +115,12 @@
       const v = variants[variant] || variants.primary;
       const s = sizes[size] || sizes.md;
       const El = href ? 'a' : 'button';
+      const isExternal = href && (href.startsWith('https://') || href.startsWith('tel:'));
       return (
-        <El href={href} onClick={onClick} style={{
+        <El href={href} onClick={onClick}
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+        style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
           gap: 8, cursor: 'pointer', borderRadius: 0, textDecoration: 'none',
           fontFamily: 'Barlow, sans-serif', fontWeight: 700,
@@ -306,7 +310,7 @@
                 Chaque voiture = une transaction réussie, un client livré.<br />Aucune arnaque, aucun vice caché.
               </p>
               <div className="hero-btns" style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12, flexWrap: 'wrap' }}>
-                <Btn href="https://wa.me/221XXXXXXXXX" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center' } : {}}>
+                <Btn href="https://wa.me/221778346464" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center' } : {}}>
                   <WaIcon size={16} /> Écrire sur WhatsApp
                 </Btn>
                 <Btn href="catalogue.html" variant="ghost" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center' } : {}}>
@@ -359,7 +363,7 @@
                 Je réponds en moyenne sous 1h, 7j/7.<br />WhatsApp ou appel, selon ta préférence.
               </p>
               <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 12, flexWrap: 'wrap', justifyContent: 'center', width: isMobile ? '100%' : 'auto' }}>
-                <Btn href="https://wa.me/221XXXXXXXXX" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center', width: '100%' } : {}}>
+                <Btn href="https://wa.me/221778346464" variant="whatsapp" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center', width: '100%' } : {}}>
                   <WaIcon size={18} /> Écrire sur WhatsApp
                 </Btn>
                 <Btn href="catalogue.html" variant="ghost" size={isMobile ? 'md' : 'lg'} style={isMobile ? { justifyContent: 'center', width: '100%' } : {}}>
