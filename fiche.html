@@ -20,6 +20,11 @@
   <meta property="og:image" content="https://www.mrautocanada.com/logo.jpg" />
   <meta property="og:url" content="https://www.mrautocanada.com/fiche" />
   <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Fiche voiture — Mrauto Canada" />
+  <meta name="twitter:description" content="Fiche détaillée de la voiture — Mrauto Canada à Dakar. Prix, kilométrage, photos, essai routier disponible." />
+  <meta name="twitter:image" content="https://www.mrautocanada.com/logo.jpg" />
+  <meta name="twitter:image:alt" content="Logo Mrauto Canada" />
   <link rel="canonical" href="https://www.mrautocanada.com/fiche" id="canonical-tag" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -274,6 +279,8 @@
         document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
         document.querySelector('meta[property="og:url"]').setAttribute('content', url);
         document.getElementById('canonical-tag').setAttribute('href', url);
+        document.querySelector('meta[name="twitter:title"]').setAttribute('content', title);
+        document.querySelector('meta[name="twitter:description"]').setAttribute('content', desc);
       }, [car]);
 
       if (loading) return (
