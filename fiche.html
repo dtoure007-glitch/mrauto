@@ -258,6 +258,24 @@
           });
       }, []);
 
+      React.useEffect(() => {
+        if (!car) return;
+        const id = new URLSearchParams(window.location.search).get('id');
+        const title = `${car.year} ${car.brand} ${car.model} à vendre — MRAUTO Canada`;
+        const specs = [car.km, car.fuel, car.transmission].filter(Boolean).join(', ');
+        const desc = car.description
+          ? `${car.brand} ${car.model} ${car.year} à ${car.price} — ${car.description.slice(0, 120)}`
+          : `Achetez cette ${car.brand} ${car.model} ${car.year} à ${car.price} chez MRAUTO Canada à Dakar. ${specs}. Livraison disponible.`;
+        const url = `https://www.mrautocanada.com/fiche${id ? '?id=' + id : ''}`;
+
+        document.title = title;
+        document.querySelector('meta[name="description"]').setAttribute('content', desc);
+        document.querySelector('meta[property="og:title"]').setAttribute('content', title);
+        document.querySelector('meta[property="og:description"]').setAttribute('content', desc);
+        document.querySelector('meta[property="og:url"]').setAttribute('content', url);
+        document.getElementById('canonical-tag').setAttribute('href', url);
+      }, [car]);
+
       if (loading) return (
         <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           Chargement…
