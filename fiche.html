@@ -12,7 +12,7 @@
     gtag('js', new Date());
     gtag('config', 'G-8Y0NHYYXT3');
   </script>
-  <title>Fiche voiture — MRAUTO Canada</title>
+  <title>Fiche voiture — Mrauto Canada</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Fiche détaillée de la voiture — Mrauto Canada à Dakar. Prix, kilométrage, photos, essai routier disponible. Livraison à domicile." />
   <meta property="og:title" content="Fiche voiture — Mrauto Canada" />
@@ -269,7 +269,7 @@
       React.useEffect(() => {
         if (!car) return;
         const id = new URLSearchParams(window.location.search).get('id');
-        const title = `${car.year} ${car.brand} ${car.model} à vendre — MRAUTO Canada`;
+        const title = `${car.year} ${car.brand} ${car.model} à vendre — Mrauto Canada`;
         const specs = [car.km, car.fuel, car.transmission].filter(Boolean).join(', ');
         const desc = car.description
           ? `${car.brand} ${car.model} ${car.year} à ${car.price} — ${car.description.slice(0, 120)}`
