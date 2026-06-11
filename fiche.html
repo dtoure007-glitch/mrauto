@@ -313,6 +313,23 @@
         schemaEl.id   = 'car-schema-ld';
         schemaEl.text = JSON.stringify(carSchema);
         document.head.appendChild(schemaEl);
+
+        const prevBc = document.getElementById('breadcrumb-schema-ld');
+        if (prevBc) prevBc.remove();
+        const breadcrumb = {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil",   "item": "https://www.mrautocanada.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Catalogue", "item": "https://www.mrautocanada.com/catalogue" },
+            { "@type": "ListItem", "position": 3, "name": `${car.brand} ${car.model} ${car.year}`, "item": url }
+          ]
+        };
+        const bcEl = document.createElement('script');
+        bcEl.type = 'application/ld+json';
+        bcEl.id   = 'breadcrumb-schema-ld';
+        bcEl.text = JSON.stringify(breadcrumb);
+        document.head.appendChild(bcEl);
       }, [car]);
 
       if (loading) return (
