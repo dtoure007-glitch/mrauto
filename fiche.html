@@ -284,6 +284,35 @@
         document.getElementById('canonical-tag').setAttribute('href', url);
         document.querySelector('meta[name="twitter:title"]').setAttribute('content', title);
         document.querySelector('meta[name="twitter:description"]').setAttribute('content', desc);
+
+        const prev = document.getElementById('car-schema-ld');
+        if (prev) prev.remove();
+        const priceNum = parseInt((car.price || '').replace(/\D/g, ''), 10) || undefined;
+        const kmNum    = parseInt((car.km    || '').replace(/\D/g, ''), 10) || undefined;
+        const carSchema = {
+          "@context": "https://schema.org",
+          "@type": "Car",
+          "name": `${car.brand} ${car.model} ${car.year}`,
+          "brand": { "@type": "Brand", "name": car.brand },
+          "modelDate": String(car.year),
+          ...(car.fuel         && { "fuelType": car.fuel }),
+          ...(car.transmission && { "vehicleTransmission": car.transmission }),
+          ...(car.color        && { "color": car.color }),
+          ...(kmNum            && { "mileageFromOdometer": { "@type": "QuantitativeValue", "value": kmNum, "unitCode": "KMT" } }),
+          ...(car.cover_photo  && { "image": car.cover_photo }),
+          "offers": {
+            "@type": "Offer",
+            "availability": "https://schema.org/InStock",
+            "priceCurrency": "XOF",
+            ...(priceNum && { "price": priceNum }),
+            "seller": { "@type": "AutoDealer", "name": "Mrauto Canada" }
+          }
+        };
+        const schemaEl = document.createElement('script');
+        schemaEl.type = 'application/ld+json';
+        schemaEl.id   = 'car-schema-ld';
+        schemaEl.text = JSON.stringify(carSchema);
+        document.head.appendChild(schemaEl);
       }, [car]);
 
       if (loading) return (
