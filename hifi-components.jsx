@@ -115,7 +115,7 @@ function SpecChip({ children }) {
 }
 
 // ── BUTTON ────────────────────────────────────────────────────────────────────
-function HifiBtn({ children, variant = 'primary', size = 'md', href, onClick, style = {}, full = false }) {
+function HifiBtn({ children, variant = 'primary', size = 'md', href, onClick, style = {}, full = false, type, disabled }) {
   const sz = {
     sm: { padding: '9px 18px', fontSize: 11 },
     md: { padding: '13px 26px', fontSize: 12 },
@@ -131,21 +131,21 @@ function HifiBtn({ children, variant = 'primary', size = 'md', href, onClick, st
   const El = href ? 'a' : 'button';
   const isExternal = href && (href.startsWith('https://') || href.startsWith('tel:'));
   return (
-    <El href={href} onClick={onClick}
+    <El href={href} onClick={onClick} type={El === 'button' ? (type || 'button') : undefined}
+    disabled={El === 'button' ? disabled : undefined}
     target={isExternal ? '_blank' : undefined}
     rel={isExternal ? 'noopener noreferrer' : undefined}
     style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      gap: 8, width: full ? '100%' : undefined, cursor: 'pointer',
+      gap: 8, width: full ? '100%' : undefined, cursor: disabled ? 'not-allowed' : 'pointer',
       fontFamily: 'var(--font-body)', fontWeight: 700,
       letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none',
-      borderRadius: 0, transition: 'opacity 0.15s ease',
+      borderRadius: 0, transition: 'opacity 0.15s ease', opacity: disabled ? 0.55 : 1,
       ...vr, ...sz, ...style
     }}
-    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}>
+    onMouseEnter={(e) => { if (!disabled) e.currentTarget.style.opacity = '0.8'; }}
+    onMouseLeave={(e) => { if (!disabled) e.currentTarget.style.opacity = '1'; }}>
       {children}</El>);
-
 }
 
 // ── WHATSAPP ICON ─────────────────────────────────────────────────────────────

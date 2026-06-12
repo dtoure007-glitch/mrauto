@@ -40,6 +40,30 @@ alter table cars add column if not exists featured boolean not null default fals
 -- Prix de vente final (renseigné lors du marquage "vendue" dans l'admin)
 alter table cars add column if not exists prix_vente text;
 
+-- ── Table messages de contact ─────────────────────────────────────────────
+create table if not exists contact_messages (
+  id           uuid primary key default gen_random_uuid(),
+  name         text not null,
+  phone        text not null,
+  car_interest text,
+  budget       text,
+  message      text,
+  created_at   timestamptz not null default now()
+);
+
+-- Lecture interdite en anonyme, insertion publique autorisée
+alter table contact_messages enable row level security;
+
+create policy "insert_public" on contact_messages
+  for insert
+  to anon
+  with check (true);
+
+create policy "read_admin" on contact_messages
+  for select
+  to authenticated
+  using (true);
+
 -- Données de départ (6 voitures fictives)
 insert into cars (brand, model, year, price, km, fuel, transmission, color, badge, status) values
   ('BMW',        'X5',    '2019', '18 500 000 FCFA', '62 000 km', 'Diesel',  'Auto', 'Noir',  'Nouveau',       'available'),

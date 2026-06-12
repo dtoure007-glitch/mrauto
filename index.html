@@ -3,6 +3,11 @@
 <head>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+  <meta name="theme-color" content="#E2001A">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mrauto Canada">
   <meta charset="utf-8" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-8Y0NHYYXT3"></script>
@@ -138,6 +143,46 @@
     "description": "Concessionnaire de voitures d'occasion à Dakar, Sénégal. Véhicules inspectés, papiers vérifiés, essai routier gratuit et livraison à domicile.",
     "foundingDate": "2020",
     "priceRange": "$$"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Comment acheter une voiture chez Mrauto Canada ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Choisissez votre voiture dans notre catalogue, contactez-nous par WhatsApp ou formulaire, puis on organise un essai routier à Dakar. Les papiers et le dédouanement sont inclus dans le prix."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Proposez-vous un essai routier ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, l'essai routier est gratuit et inclus pour tous nos véhicules. Il se déroule à Dakar sur rendez-vous, à votre convenance."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Livrez-vous à domicile à Dakar ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Oui, nous assurons la livraison à domicile partout à Dakar et dans ses environs, sans frais supplémentaires."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Les papiers sont-ils vérifiés ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolument. Chaque véhicule est dédouané et ses documents officiels sont vérifiés avant la vente. Aucune mauvaise surprise, aucun vice caché."
+        }
+      }
+    ]
   }
   </script>
   <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" integrity="sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z" crossorigin="anonymous"></script>
@@ -569,8 +614,75 @@ function CtaPushSection() {
 
 }
 
+// ── FAQ ─────────────────────────────────────────────────────────────────────
+const FAQ_ITEMS = [
+  { q: 'Comment acheter une voiture chez Mrauto Canada ?', a: 'Choisissez votre voiture dans le catalogue, contactez-nous par WhatsApp ou formulaire, puis on organise un essai routier. Les papiers et le dédouanement sont inclus dans le prix.' },
+  { q: 'Proposez-vous un essai routier ?', a: 'Oui, l\'essai routier est gratuit et inclus pour tous nos véhicules. Il se déroule à Dakar sur rendez-vous, selon vos disponibilités.' },
+  { q: 'Livrez-vous à domicile à Dakar ?', a: 'Oui, nous assurons la livraison à domicile partout à Dakar et dans ses environs, sans frais supplémentaires.' },
+  { q: 'Les papiers sont-ils vérifiés ?', a: 'Absolument. Chaque véhicule est dédouané et ses documents officiels sont vérifiés avant la vente. Aucune mauvaise surprise, aucun vice caché.' },
+];
+
+function FaqItem({ q, a }) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <div style={{ borderBottom: '1px solid var(--border)' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '18px 0', background: 'none', cursor: 'pointer', gap: 16 }}
+      >
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: 17, fontWeight: 700, color: 'var(--text)', textAlign: 'left', textTransform: 'uppercase', letterSpacing: '0.02em' }}>{q}</span>
+        <span style={{ fontSize: 20, color: 'var(--accent)', flexShrink: 0, transition: 'transform 0.2s', transform: open ? 'rotate(45deg)' : 'none' }}>+</span>
+      </button>
+      {open && (
+        <p style={{ fontFamily: 'var(--font-body)', fontSize: 15, color: 'var(--text-muted)', lineHeight: 1.7, paddingBottom: 18 }}>{a}</p>
+      )}
+    </div>
+  );
+}
+
+function FaqSection() {
+  return (
+    <section style={{ background: 'var(--bg)', padding: '0 60px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: '80px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+          <MStripe height={2} style={{ width: 20 }} />
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: 10, fontWeight: 700, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--accent)' }}>faq</span>
+        </div>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px,4vw,56px)', fontWeight: 900, color: 'var(--text)', textTransform: 'uppercase', letterSpacing: '0.01em', marginBottom: 40 }}>Questions fréquentes</h2>
+        <div>
+          {FAQ_ITEMS.map((item, i) => <FaqItem key={i} q={item.q} a={item.a} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ── CONTACT ────────────────────────────────────────────────────────────────
 function ContactSection() {
+  const [form, setForm] = React.useState({ name: '', phone: '', car: '', budget: '', message: '' });
+  const [status, setStatus] = React.useState('idle'); // idle | sending | success | error
+
+  const handleChange = (e) => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.phone.trim()) return;
+    setStatus('sending');
+    const { error } = await sb.from('contact_messages').insert([{
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      car_interest: form.car.trim() || null,
+      budget: form.budget.trim() || null,
+      message: form.message.trim() || null,
+    }]);
+    if (error) {
+      setStatus('error');
+    } else {
+      setStatus('success');
+      setForm({ name: '', phone: '', car: '', budget: '', message: '' });
+    }
+  };
+
   return (
     <section id="contact" className="sec" style={{ background: 'var(--bg-alt)' }}>
           <div className="max-w contact-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64 }}>
@@ -589,24 +701,37 @@ function ContactSection() {
               <MStripe height={3} />
               <div style={{ padding: 32 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 28, fontWeight: 900, color: 'var(--text)', marginBottom: 24, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Envoie-nous un message</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {[['Ton nom', 'text', 'iname'], ['Téléphone', 'tel', 'itel'], ["Voiture qui t'intéresse", 'text', 'icar'], ['Budget approximatif', 'text', 'ibudget']].map(([label, type, id]) =>
-              <div key={id}>
-                      <label className="fl" htmlFor={id}>{label}</label>
-                      <input id={id} type={type} className="fi" placeholder={label} />
-                    </div>
-              )}
-                  <div>
-                    <label className="fl" htmlFor="imsg">Message (optionnel)</label>
-                    <textarea id="imsg" className="fta" placeholder="Des précisions, des questions..."></textarea>
+                {status === 'success' ? (
+                  <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                    <div style={{ fontSize: 40, marginBottom: 16 }}>✓</div>
+                    <p style={{ fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase' }}>Message envoyé !</p>
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-muted)', marginTop: 8 }}>Je reviens vers toi très vite.</p>
+                    <button onClick={() => setStatus('idle')} style={{ marginTop: 20, background: 'none', color: 'var(--accent)', fontFamily: 'var(--font-body)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline' }}>Envoyer un autre message</button>
                   </div>
-                  <HifiBtn variant="primary" full style={{ marginTop: 4 }}>Envoyer le message →</HifiBtn>
-                </div>
+                ) : (
+                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {[['Ton nom *', 'text', 'name'], ['Téléphone *', 'tel', 'phone'], ["Voiture qui t'intéresse", 'text', 'car'], ['Budget approximatif', 'text', 'budget']].map(([label, type, name]) =>
+                      <div key={name}>
+                        <label className="fl" htmlFor={`c-${name}`}>{label}</label>
+                        <input id={`c-${name}`} name={name} type={type} className="fi" placeholder={label.replace(' *','')} value={form[name]} onChange={handleChange} required={label.endsWith('*')} />
+                      </div>
+                    )}
+                    <div>
+                      <label className="fl" htmlFor="c-message">Message (optionnel)</label>
+                      <textarea id="c-message" name="message" className="fta" placeholder="Des précisions, des questions..." value={form.message} onChange={handleChange}></textarea>
+                    </div>
+                    {status === 'error' && (
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: '#c0392b' }}>Une erreur est survenue. Contacte-nous directement sur WhatsApp.</p>
+                    )}
+                    <HifiBtn variant="primary" full style={{ marginTop: 4 }} type="submit" disabled={status === 'sending'}>
+                      {status === 'sending' ? 'Envoi en cours...' : 'Envoyer le message →'}
+                    </HifiBtn>
+                  </form>
+                )}
               </div>
             </div>
           </div>
         </section>);
-
 }
 
 // ── APP ────────────────────────────────────────────────────────────────────
@@ -669,6 +794,7 @@ function App() {
           <DemarcheSection />
           <SocialProofSection />
           <CtaPushSection />
+          <FaqSection />
           <ContactSection />
           <HifiFooter />
           <TweaksPanel>
