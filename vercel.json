@@ -15,7 +15,8 @@
     { "source": "/catalogue", "destination": "/catalogue.html" },
     { "source": "/fiche", "destination": "/fiche.html" },
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/vendues", "destination": "/vendues.html" }
+    { "source": "/vendues", "destination": "/vendues.html" },
+    { "source": "/(.*)", "destination": "/404.html" }
   ],
   "headers": [
     {
