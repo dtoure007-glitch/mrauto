@@ -34,6 +34,9 @@
   <link rel="canonical" href="https://www.mrautocanada.com/fiche" id="canonical-tag" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
+  <link rel="dns-prefetch" href="https://www.google-analytics.com" />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="preload" as="image" href="logo.jpg" />
   <link rel="preconnect" href="https://tunszuazffcniyaylxwj.supabase.co" />
@@ -162,7 +165,7 @@
         <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, background: 'var(--nav-bg)', backdropFilter: 'blur(20px)', borderBottom: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
           <div style={{ height: 2, background: 'var(--accent)' }} />
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isMobile ? '0 16px' : '0 40px', height: 66 }}>
-            <a href="catalogue.html"
+            <a href="/catalogue"
               onClick={e => { e.preventDefault(); goBack('catalogue.html'); }}
               style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', transition: 'color 0.15s' }}
               onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}

@@ -3,6 +3,13 @@
   "outputDirectory": ".",
   "installCommand": null,
   "framework": null,
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    { "source": "/catalogue.html", "destination": "/catalogue", "permanent": true },
+    { "source": "/vendues.html", "destination": "/vendues", "permanent": true },
+    { "source": "/fiche.html", "destination": "/fiche", "permanent": true },
+    { "source": "/admin.html", "destination": "/admin", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/voitures", "destination": "/index.html" },
     { "source": "/catalogue", "destination": "/catalogue.html" },

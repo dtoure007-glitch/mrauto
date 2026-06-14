@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /og-image-generator.html
 
 Sitemap: https://www.mrautocanada.com/sitemap.xml
