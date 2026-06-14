@@ -1,319 +1,233 @@
-# Plan d'Action SEO — MR Auto Canada
-**Basé sur l'audit du 2026-06-10**
+# Plan d'Action SEO — Mrauto Canada
+**Mis à jour :** 14 juin 2026  
+**Basé sur :** Audit v2.0 — Score actuel : 58/100
 
 ---
 
-## CRITIQUE — À corriger immédiatement
+## CRITIQUE — À faire immédiatement
 
-### C-1 : Passer React en mode production
-**Fichiers** : `index.html` (ligne 100-101), `catalogue.html` (lignes 56-57)  
-**Impact** : Performance, LCP, score Core Web Vitals  
-**Effort** : 10 min
+### C-1 · Bloquer /admin dans robots.txt
+**Effort :** 5 min | **Impact :** Sécurité + SEO
 
-Remplacer :
-```html
-react.development.js  →  react.production.min.js
-react-dom.development.js  →  react-dom.production.min.js
-```
-
-### C-2 : Ajouter les balises canoniques manquantes
-**Fichiers** : `catalogue.html`, `fiche.html`, `vendues.html`  
-**Impact** : Indexation, duplicate content  
-**Effort** : 15 min
-
-Dans `<head>` de chaque page :
-```html
-<!-- catalogue.html -->
-<link rel="canonical" href="https://www.mrautocanada.com/catalogue" />
-
-<!-- vendues.html -->
-<link rel="canonical" href="https://www.mrautocanada.com/vendues" />
-
-<!-- fiche.html — dynamique, à mettre à jour via JS -->
-<link rel="canonical" href="https://www.mrautocanada.com/fiche" id="canonical-tag" />
-```
-
-Pour `fiche.html`, ajouter dans le `React.useEffect` du chargement de la voiture :
-```js
-document.querySelector('#canonical-tag').href =
-  `https://www.mrautocanada.com/fiche?id=${id}`;
-```
-
-### C-3 : Meta titre dynamique sur fiche.html
-**Fichier** : `fiche.html`  
-**Impact** : Indexation individuelle des fiches, CTR  
-**Effort** : 20 min
-
-Dans `FichePage`, ajouter :
-```js
-React.useEffect(() => {
-  document.title = `${car.brand} ${car.model} ${car.year} — ${car.price} | Mrauto Canada`;
-  document.querySelector('meta[name="description"]').content =
-    `${car.brand} ${car.model} ${car.year}, ${car.km}, ${car.fuel}. ${car.price}. Essai routier gratuit, livraison à Dakar. Mrauto Canada.`;
-}, [car]);
-```
+Ajouter `Disallow: /admin` et `Disallow: /admin.html` dans robots.txt.
 
 ---
 
-## HAUT — À corriger dans la semaine
+### C-2 · Architecture fiche voiture — Migrer vers SSR ou Static Generation
+**Effort :** 3-5 jours | **Impact :** +25 pts de score SEO potentiel
 
-### H-1 : Ajouter le schéma JSON-LD Organization + LocalBusiness
-**Fichier** : `index.html`  
-**Impact** : Rich results, Knowledge Graph, Local Pack Google  
-**Effort** : 30 min
+**Problème :** `fiche.html?id=XXX` avec rendu CSR = pages non indexables individuellement.
 
-Ajouter dans `<head>` de `index.html` :
-```html
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": ["AutoDealer", "LocalBusiness"],
-  "name": "Mrauto Canada",
-  "url": "https://www.mrautocanada.com",
-  "telephone": "+221778346464",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Dakar",
-    "addressCountry": "SN"
-  },
-  "areaServed": {
-    "@type": "City",
-    "name": "Dakar"
-  },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
-    "opens": "08:00",
-    "closes": "20:00"
-  },
-  "sameAs": [
-    "https://www.tiktok.com/@mrautoscanada",
-    "https://www.instagram.com/mrautos_canada",
-    "https://www.facebook.com/share/1G5fghNpeT/"
-  ],
-  "logo": "https://www.mrautocanada.com/logo.jpg",
-  "image": "https://www.mrautocanada.com/logo.jpg",
-  "description": "Concessionnaire de voitures d'occasion à Dakar, Sénégal. Véhicules inspectés, papiers vérifiés, essai routier gratuit et livraison à domicile.",
-  "foundingDate": "2020",
-  "priceRange": "$$"
-}
-</script>
+**Solution recommandée : Next.js App Router**
 ```
-
-### H-2 : Ajouter les balises Twitter Card manquantes
-**Fichiers** : `catalogue.html`, `fiche.html`, `vendues.html`  
-**Impact** : Partages sur X/Twitter, meilleure prévisualisation  
-**Effort** : 15 min
-
-Dans `<head>` de chaque page :
-```html
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="[titre de la page]" />
-<meta name="twitter:description" content="[description de la page]" />
-<meta name="twitter:image" content="https://www.mrautocanada.com/logo.jpg" />
-<meta name="twitter:image:alt" content="Logo Mrauto Canada" />
+/voitures/toyota-corolla-2019  <- URL propre, statique, indexable
+/voitures/honda-crv-2020
 ```
+Chaque page générée avec `generateStaticParams()` depuis Supabase à build time.
 
-### H-3 : Ajouter og:locale et og:image:width/height manquants
-**Fichiers** : `catalogue.html`, `fiche.html`, `vendues.html`  
-**Impact** : Affichage correct des prévisualisations sociales  
-**Effort** : 10 min
+**Alternative rapide :** Pré-générer les fiches HTML depuis un script Node.js à chaque mise à jour du catalogue.
 
-```html
-<meta property="og:locale" content="fr_SN" />
-<meta property="og:image:width" content="1170" />
-<meta property="og:image:height" content="990" />
-```
+---
 
-### H-4 : Corriger le sitemap.xml
-**Fichier** : `sitemap.xml`  
-**Impact** : Indexation correcte  
-**Effort** : 15 min
+### C-3 · Supprimer Babel Standalone — Pré-compiler le JSX
+**Effort :** 1-2 jours | **Impact :** LCP -60%, score CWV +40 pts
 
-- Remplacer `/fiche.html` par `/fiche` (URL propre) ou retirer cette URL du sitemap
-- Remplacer `/catalogue.html` et `/vendues.html` par `/catalogue` et `/vendues`
-- Mettre à jour `lastmod` avec la vraie date de modification
+Babel Standalone (882 KB) transpile le JSX dans le navigateur à chaque visite.
+La solution : pré-compiler une fois à l'étape de build (esbuild, Vite, ou Next.js).
 
-### H-5 : Compléter les en-têtes de sécurité
-**Fichier** : `vercel.json`  
-**Impact** : Sécurité, confiance Google  
-**Effort** : 20 min
+---
 
-Ajouter dans la section `headers` :
+## HAUTE PRIORITÉ — Semaine 1
+
+### H-1 · Schema AggregateRating sur la homepage
+**Effort :** 30 min | **Impact :** Rich snippets étoiles dans Google
+
+Ajouter dans le schéma AutoDealer existant :
 ```json
-{ "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-{ "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-{ "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+"aggregateRating": {
+  "@type": "AggregateRating",
+  "ratingValue": "5",
+  "reviewCount": "20",
+  "bestRating": "5"
+}
 ```
-
-### H-6 : Ajouter SRI sur fiche.html et vendues.html
-**Fichiers** : `fiche.html` (lignes 63-65), `vendues.html` (lignes 44-46)  
-**Impact** : Sécurité, best practice  
-**Effort** : 10 min
-
-Ajouter les attributs `integrity="sha384-..."` identiques à ceux de `index.html` sur les balises `<script>` React et Babel.
-
-### H-7 : Unifier la casse de la marque
-**Tous les fichiers**  
-**Impact** : Cohérence de marque, confiance  
-**Effort** : 10 min
-
-Choisir une convention unique — recommandé : **"Mrauto Canada"** (titre) dans tous les `<title>` et balises meta. Utiliser **"MRAUTO Canada"** pour les éléments visuels UI seulement.
 
 ---
 
-## MOYEN — À planifier dans le mois
+### H-2 · Schema ItemList sur vendues.html
+**Effort :** 1h | **Impact :** Google comprend que c'est une liste de produits
 
-### M-1 : Schéma Car/Product sur les fiches voiture
-**Fichier** : `fiche.html`  
-**Impact** : Rich results produit avec prix en SERP  
-**Effort** : 45 min
+Ajouter un bloc `ItemList` JSON-LD avec les voitures vendues.
 
-Générer dynamiquement via JS après chargement de la fiche :
-```js
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "Car",
-  "name": `${car.brand} ${car.model} ${car.year}`,
-  "brand": { "@type": "Brand", "name": car.brand },
-  "modelDate": car.year,
-  "mileageFromOdometer": { "@type": "QuantitativeValue", "value": car.km_numeric },
-  "fuelType": car.fuel,
-  "vehicleTransmission": car.transmission,
-  "color": car.color,
-  "offers": {
-    "@type": "Offer",
-    "price": car.price_numeric,
-    "priceCurrency": "XOF",
-    "availability": "https://schema.org/InStock",
-    "seller": { "@type": "AutoDealer", "name": "Mrauto Canada" }
+---
+
+### H-3 · Enrichir llms.txt
+**Effort :** 30 min | **Impact :** Meilleure citation par ChatGPT, Perplexity, etc.
+
+Ajouter : processus d'achat en 5 étapes, FAQ complète, fourchette de prix (FCFA), zones desservies (quartiers de Dakar), marques typiques.
+
+---
+
+### H-4 · OG Image dédiée par page (1200x630)
+**Effort :** 2h | **Impact :** +30% CTR sur les partages WhatsApp/Facebook
+
+Créer 3 images OG 1200x630 (utiliser `og-image-generator.html` déjà présent) :
+- Home : Logo + tagline sur fond sombre
+- Catalogue : Grille voitures + titre
+- Vendues : Photo livraison + "20+ clients livrés"
+
+Remplacer les balises og:image sur chaque page.
+
+---
+
+### H-5 · Corriger le canonical de la home
+**Effort :** 5 min | **Impact :** Évite les conflits de canonicalisation
+
+```html
+<!-- Avant -->
+<link rel="canonical" href="https://www.mrautocanada.com" />
+<!-- Après -->
+<link rel="canonical" href="https://www.mrautocanada.com/" />
+```
+
+---
+
+### H-6 · Unifier la casse du nom de marque
+**Effort :** 15 min | **Impact :** Cohérence NAP pour le Local SEO
+
+Choisir "MRAUTO Canada" et l'appliquer dans le schema JSON-LD ET dans l'UI (footer, nav).
+
+---
+
+### H-7 · Versionner hifi-components.jsx sur fiche.html
+**Effort :** 2 min | **Impact :** Évite le cache stale
+
+```html
+<script type="text/babel" src="hifi-components.jsx?v=4"></script>
+```
+
+---
+
+## PRIORITÉ MOYENNE — Mois 1
+
+### M-1 · Adresse physique précise
+**Effort :** 30 min | **Impact :** Local SEO significatif
+
+Ajouter quartier / rue / point de repère dans le schéma JSON-LD, la section Contact et le footer.
+
+---
+
+### M-2 · Section témoignages textuels + schema Review
+**Effort :** 2h | **Impact :** E-E-A-T fort + conversion
+
+3-5 témoignages de clients réels avec prénom, quartier, voiture. Schema Review correspondant.
+
+---
+
+### M-3 · Schema WebSite + SearchAction
+**Effort :** 20 min | **Impact :** Éligibilité Sitelinks Search Box
+
+```json
+{
+  "@type": "WebSite",
+  "url": "https://www.mrautocanada.com/",
+  "name": "MRAUTO Canada",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://www.mrautocanada.com/catalogue?q={search_term_string}",
+    "query-input": "required name=search_term_string"
   }
-};
-const script = document.createElement('script');
-script.type = 'application/ld+json';
-script.text = JSON.stringify(schema);
-document.head.appendChild(script);
+}
 ```
-
-### M-2 : Créer /llms.txt
-**Fichier** : `llms.txt` (nouveau)  
-**Impact** : Visibilité IA (ChatGPT, Perplexity, Claude)  
-**Effort** : 15 min
-
-```
-# Mrauto Canada
-
-Concessionnaire de voitures d'occasion à Dakar, Sénégal.
-Fondé en 2020. Spécialiste de l'import de véhicules depuis le Canada.
-
-## Services
-- Vente de voitures d'occasion inspectées
-- Papiers vérifiés et dédouanement inclus
-- Essai routier gratuit
-- Livraison à domicile à Dakar
-
-## Contact
-Téléphone / WhatsApp : +221 77 834 64 64
-Site : https://www.mrautocanada.com
-
-## Pages principales
-- Catalogue : https://www.mrautocanada.com/catalogue
-- Voitures vendues : https://www.mrautocanada.com/vendues
-- Contact : https://www.mrautocanada.com/#contact
-```
-
-### M-3 : Corriger le formulaire de contact (handler onSubmit)
-**Fichier** : `index.html` — `ContactSection`  
-**Impact** : Conversion, expérience utilisateur  
-**Effort** : 1-2h
-
-Ajouter un handler qui envoie les données (via Supabase insert ou email service).
-
-### M-4 : Schéma BreadcrumbList
-**Fichiers** : `catalogue.html`, `fiche.html`  
-**Impact** : Fil d'Ariane en SERP  
-**Effort** : 30 min
-
-### M-5 : Schéma FAQ sur la homepage
-**Fichier** : `index.html`  
-**Impact** : Expanded results en SERP, visibilité IA  
-**Effort** : 30 min
-
-Ajouter une section FAQ (peut rester discrète visuellement) avec les questions fréquentes :
-- "Comment acheter une voiture chez Mrauto Canada ?"
-- "Proposez-vous un essai routier ?"
-- "Livrez-vous à domicile à Dakar ?"
-- "Les papiers sont-ils vérifiés ?"
-
-### M-6 : Optimiser les titres de page trop courts
-**Fichiers** : `catalogue.html`, `fiche.html`, `vendues.html`  
-**Impact** : CTR en SERP  
-**Effort** : 10 min
-
-Suggestions :
-- Catalogue : "Catalogue voitures d'occasion Dakar — Mrauto Canada"
-- Vendues : "Voitures vendues à Dakar — Mrauto Canada | 20+ livraisons"
-- Fiche : dynamique — voir C-3 ci-dessus
-
-### M-7 : Créer une image OG dédiée
-**Remplacement de** : `logo.jpg` pour les partages sociaux  
-**Impact** : CTR partages WhatsApp, Facebook, Twitter  
-**Effort** : 1h design
-
-Créer une image `og-cover.jpg` en **1200×630** avec le nom de la marque, une voiture et la valeur proposition ("Voitures d'occasion à Dakar"). L'utiliser dans toutes les balises `og:image`.
 
 ---
 
-## BAS — Backlog
+### M-4 · Content-Security-Policy header
+**Effort :** 1h | **Impact :** Sécurité + signal confiance
 
-### B-1 : Passer à un vrai bundler (Vite)
-Éliminer Babel in-browser et React dev mode. Gain de performance estimé : 60-70% sur le JS.  
-**Effort** : 2-4 jours | **Impact** : LCP < 2s
-
-### B-2 : Apple Touch Icon + Web App Manifest
-**Effort** : 1h | Améliore l'expérience mobile
-
-### B-3 : Passer le favicon en PNG/ICO
-**Effort** : 30 min
-
-### B-4 : Générer des URLs de fiche sémantiques
-`/fiche?id=123` → `/voitures/toyota-corolla-2021`  
-Nécessite un routeur ou génération statique.  
-**Effort** : 1-2 jours
-
-### B-5 : Ajouter Google Analytics / Tag Manager
-Pour tracker les conversions WhatsApp, appels, et pages vues.  
-**Effort** : 1h
-
-### B-6 : Page "À propos" dédiée
-Renforce l'E-E-A-T (Expérience, Expertise, Autorité, Confiance).  
-**Effort** : 2h design + rédaction
+Ajouter une CSP dans vercel.json couvrant les domaines utilisés : unpkg.com, cdn.jsdelivr.net, fonts.googleapis.com, Supabase, Google Analytics.
 
 ---
 
-## Récapitulatif priorités
+### M-5 · Enrichir la meta description de vendues.html
+**Effort :** 5 min
 
-| # | Tâche | Priorité | Effort | Impact |
-|---|-------|----------|--------|--------|
-| C-1 | React prod mode | Critique | 10 min | LCP ↑↑ |
-| C-2 | Canonical sur 3 pages | Critique | 15 min | Indexation ↑↑ |
-| C-3 | Meta titre dynamique fiche | Critique | 20 min | CTR fiches ↑↑↑ |
-| H-1 | Schema Organization/LocalBusiness | Haut | 30 min | Local SEO ↑↑↑ |
-| H-2 | Twitter Card sur 3 pages | Haut | 15 min | Social sharing ↑ |
-| H-3 | og:locale + image dims | Haut | 10 min | Social sharing ↑ |
-| H-4 | Sitemap corrigé | Haut | 15 min | Indexation ↑ |
-| H-5 | En-têtes sécurité | Haut | 20 min | Confiance ↑ |
-| H-6 | SRI sur fiche+vendues | Haut | 10 min | Sécurité ↑ |
-| H-7 | Unifier casse marque | Haut | 10 min | Cohérence ↑ |
-| M-1 | Schema Car/Product | Moyen | 45 min | Rich results ↑↑ |
-| M-2 | llms.txt | Moyen | 15 min | IA search ↑ |
-| M-3 | Formulaire contact fonctionnel | Moyen | 1-2h | Conversion ↑↑ |
-| M-4 | Schema BreadcrumbList | Moyen | 30 min | SERP ↑ |
-| M-5 | Schema FAQ homepage | Moyen | 30 min | SERP + IA ↑ |
-| M-6 | Titres optimisés | Moyen | 10 min | CTR ↑ |
-| M-7 | Image OG 1200×630 | Moyen | 1h | Partages ↑ |
-| B-1 | Migration Vite | Bas | 2-4j | Perf ↑↑↑ |
-| B-4 | URLs sémantiques fiches | Bas | 1-2j | SEO structurel ↑ |
+```html
+<meta name="description" content="20+ voitures livrées à Dakar par Mrauto Canada depuis 2020. Toyota, Honda, Nissan — chaque vente, un client livré, papiers vérifiés. Zéro vice caché." />
+```
 
-**Score estimé après Critique + Haut** : **~65-68 / 100**  
-**Score estimé après tout le plan** : **~78-82 / 100**
+---
+
+### M-6 · Créer une page "À propos"
+**Effort :** 2h | **Impact :** E-E-A-T fort
+
+Photo fondateur, histoire depuis 2020, processus de sélection Canada, engagement qualité. Lien depuis la navigation.
+
+---
+
+### M-7 · Lier le Google Business Profile
+**Effort :** 30 min | **Impact :** Local Pack Google Maps
+
+Créer/revendiquer GBP, ajouter le lien dans `sameAs` du schéma, ajouter "Voir nos avis Google" dans la section contact.
+
+---
+
+## BASSE PRIORITÉ — Trimestre 1
+
+### L-1 · Articles de blog informatifs
+**Mots-clés cibles :**
+- "acheter voiture occasion Dakar"
+- "import voiture Canada Sénégal"
+- "voiture dédouanée Sénégal prix"
+
+---
+
+### L-2 · Optimisation Google Business Profile
+Photos, réponses aux avis, posts hebdomadaires nouvelles arrivées.
+
+---
+
+### L-3 · IndexNow pour Bing
+Utiliser le script `indexnow_submit.py` disponible pour notifier Bing de chaque nouvelle voiture.
+
+---
+
+## Tableau de priorisation
+
+| ID | Action | Effort | Impact | Urgence |
+|----|--------|--------|--------|---------|
+| C-1 | Bloquer /admin robots.txt | 5 min | Moyen | IMMEDIAT |
+| C-2 | Migration SSR fiche pages | 3-5j | TRÈS FORT | IMMEDIAT |
+| C-3 | Supprimer Babel Standalone | 1-2j | TRÈS FORT | IMMEDIAT |
+| H-1 | Schema AggregateRating | 30 min | Moyen | Semaine 1 |
+| H-2 | Schema ItemList vendues | 1h | Moyen | Semaine 1 |
+| H-3 | Enrichir llms.txt | 30 min | Faible | Semaine 1 |
+| H-4 | OG Images 1200x630 | 2h | Moyen | Semaine 1 |
+| H-5 | Canonical trailing slash | 5 min | Faible | Semaine 1 |
+| H-6 | Unifier casse marque | 15 min | Faible | Semaine 1 |
+| H-7 | Version hifi-components fiche | 2 min | Faible | Semaine 1 |
+| M-1 | Adresse physique complete | 30 min | FORT | Mois 1 |
+| M-2 | Temoignages textuels | 2h | Fort | Mois 1 |
+| M-3 | Schema WebSite SearchAction | 20 min | Faible | Mois 1 |
+| M-4 | Content-Security-Policy | 1h | Moyen | Mois 1 |
+| M-5 | Meta desc vendues | 5 min | Faible | Mois 1 |
+| M-6 | Page A propos | 2h | Fort | Mois 1 |
+| M-7 | Lier Google Business Profile | 30 min | FORT | Mois 1 |
+| L-1 | Blog articles | 3h/article | Tres fort | Trimestre 1 |
+
+---
+
+## Score projeté après corrections
+
+| Etape | Score estimé |
+|-------|-------------|
+| Actuellement | 58/100 |
+| + Quick wins (C-1, H-1 à H-7) | 65/100 |
+| + Mois 1 (M-1 à M-7) | 73/100 |
+| + Migration SSR (C-2) | 82/100 |
+| + Suppression Babel (C-3) | 87/100 |
+| + Contenu blog (L-1) | 91/100 |
+
+---
+
+*Plan d'action généré le 14 juin 2026 — Mrauto Canada SEO Audit v2.0*

@@ -1,367 +1,300 @@
-# Audit SEO Complet — MR Auto Canada
-**Date** : 2026-06-10  
-**Domaine** : https://www.mrautocanada.com  
-**Type** : Concessionnaire local — Voitures d'occasion — Dakar, Sénégal  
-**Stack** : HTML statique + React 18 (Babel in-browser) + Supabase + Vercel
+# Rapport d'Audit SEO Complet — Mrauto Canada
+**Date :** 14 juin 2026  
+**URL :** https://www.mrautocanada.com  
+**Pages auditées :** index.html · catalogue.html · fiche.html · vendues.html  
+**Type de business :** Service local — Concessionnaire auto (B2C, Local Search)
+
+---
+
+## Score SEO Global : **58 / 100**
+
+| Catégorie | Score | Poids | Note |
+|-----------|-------|-------|------|
+| SEO Technique | 52/100 | 22% | Bloqué par le rendu côté client |
+| Qualité de contenu | 65/100 | 23% | Bon sur la home, thin sur les autres pages |
+| On-Page SEO | 72/100 | 20% | Titres et balises bien travaillés |
+| Schémas / Données structurées | 68/100 | 10% | Home bonne, vendues vide |
+| Performance (Core Web Vitals) | 28/100 | 10% | Babel Standalone = catastrophe perf |
+| AI Search Readiness | 60/100 | 10% | llms.txt présent mais insuffisant |
+| Images | 45/100 | 5% | OG image non optimisée |
 
 ---
 
 ## Résumé Exécutif
 
-### Score SEO Global : **47 / 100** — État : ⚠️ Critique
+Le site Mrauto Canada présente une base SEO saine (metas, schémas, sitemap, robots.txt) issue des optimisations récentes. Cependant, **deux problèmes architecturaux majeurs plafonnent le score** et bloquent l'indexation réelle :
 
-| Catégorie | Poids | Score brut | Contribution |
-|-----------|-------|------------|-------------|
-| SEO Technique | 22 % | 5,5 / 10 | 12,1 |
-| Qualité du contenu | 23 % | 5,5 / 10 | 12,7 |
-| On-Page SEO | 20 % | 6,3 / 10 | 12,5 |
-| Schéma / Données structurées | 10 % | 0 / 10 | **0** |
-| Performance (CWV) | 10 % | 4,0 / 10 | 4,0 |
-| Préparation IA / GEO | 10 % | 2,5 / 10 | 2,5 |
-| Images | 5 % | 6,5 / 10 | 3,3 |
-| **TOTAL** | 100 % | | **47 / 100** |
+1. **Rendu 100% côté client avec Babel Standalone** — Toutes les pages utilisent React + Babel pour transpiler le JSX dans le navigateur. Google lit d'abord le HTML statique (vide : juste `<div id="root"></div>`) avant d'exécuter le JS lors d'une second wave de crawl retardée. Résultat : les pages fiches de voitures ont un titre générique "Fiche voiture — Mrauto Canada" au lieu du vrai contenu.
 
-### Top 5 Problèmes Critiques
+2. **Pages fiches non indexables** — Chaque voiture est accessible via `fiche.html?id=XXX`. Les URLs avec query params sont mal gérées par Google pour l'indexation individuelle. Résultat : aucune voiture spécifique ne peut ranker sur "Toyota Corolla occasion Dakar" par exemple.
 
-1. **Rendu JavaScript pur** — Le contenu de toutes les pages est rendu côté client par React. Les bots qui n'exécutent pas JavaScript (Bingbot, crawlers IA, réseaux sociaux) voient une page vide.
-2. **Zéro schema markup** — Aucune donnée structurée sur aucune page (Organization, Car, LocalBusiness, Product).
-3. **React en mode développement + Babel in-browser** — Performance catastrophique : bundle dev (~1 Mo), transpilation JSX en temps réel côté utilisateur.
-4. **fiche.html : meta titre/description statiques** — Toutes les fiches partagent le même `<title>` et la même `<meta description>`, annulant tout potentiel SEO des pages véhicules.
-5. **Canonical manquant sur 3 pages** — `catalogue.html`, `fiche.html`, `vendues.html` n'ont pas de balise `<link rel="canonical">`.
+**Top 5 problèmes critiques :**
+1. Architecture CSR — Google voit un `<div>` vide en premier crawl
+2. Pages fiches individuelles non indexables (URLs dynamiques + CSR)
+3. Performance catastrophique (Babel Standalone ~882 KB à transpiler avant tout rendu)
+4. Pas de témoignages réels / schema Review absent
+5. Adresse physique manquante (nuit au Local SEO)
 
-### Top 5 Quick Wins
-
-1. Ajouter `<link rel="canonical">` sur les 3 pages secondaires (15 min)
-2. Ajouter les balises Twitter Card manquantes sur 3 pages (15 min)
-3. Passer React en mode production (remplacer `.development.js` → `.production.min.js`) (10 min)
-4. Ajouter un schéma JSON-LD `Organization` + `LocalBusiness` sur l'accueil (30 min)
-5. Ajouter les dimensions `og:image:width` / `og:image:height` sur les 3 pages secondaires (10 min)
+**Top 5 quick wins (< 2h de travail) :**
+1. Ajouter `admin.html` au robots.txt (`Disallow: /admin`)
+2. Enrichir llms.txt avec le processus d'achat et la FAQ
+3. Ajouter le schema ItemList sur vendues.html
+4. Créer une vraie OG image 1200x630 pour chaque page
+5. Corriger le canonical de la home (ajouter le `/` final)
 
 ---
 
 ## 1. SEO Technique
 
-### 1.1 Robots.txt ✅
+### Points forts
+- `robots.txt` : Allow complet, sitemap déclaré
+- Sitemap XML : 3 URLs avec lastmod, changefreq, priority correctes
+- Rewrites Vercel : `/catalogue` → `catalogue.html` (URLs propres sans extension) ✅
+- Headers de sécurité : HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy ✅
+- Balises canoniques présentes sur toutes les pages ✅
+- `lang="fr"` et `og:locale="fr_SN"` cohérents ✅
+
+### Problèmes critiques
+
+#### CSR pur avec Babel Standalone — CRITIQUE
 ```
-User-agent: *
-Allow: /
-Sitemap: https://www.mrautocanada.com/sitemap.xml
+Flux de rendu actuel :
+1. Google reçoit : <body><div id="root"></div></body>  <- HTML vide
+2. Google met en file d'attente le rendu JS (second wave)
+3. Babel (882 KB) se telecharge → parse → transpile le JSX
+4. React s'initialise → fetch Supabase → rendu DOM
+5. Google re-crawle (delai inconnu, parfois jamais)
 ```
-**Statut** : Correct. Toutes les pages sont accessibles.
+Impact : Les metas statiques (title, description, og:image) sont indexées, mais le contenu principal des pages fiches voiture sera indexé générique.
 
-### 1.2 Sitemap XML ⚠️
+#### Pages fiches non indexables — CRITIQUE
+```
+URL actuelle : /fiche?id=abc123
+Problemes :
+- Query params = mauvaise pratique pour l'indexation
+- Contenu unique (titre, description, schema Car) injecte par JS
+- Pas dans le sitemap (impossible à lister)
+- Google ne peut pas decouvrir les URLs sans crawl JS
+```
 
-**Trouvé** : `sitemap.xml` avec 4 URLs.
+#### Admin accessible aux bots
+- `robots.txt` actuel : `Allow: /`
+- `admin.html` → accessible et crawlable par Googlebot
 
-| URL | Problème |
-|-----|----------|
-| `/` | ✅ OK |
-| `/catalogue.html` | ✅ OK |
-| `/fiche.html` | ❌ Page dynamique sans paramètre — sans `?id=XXX` la page affiche "Voiture introuvable" |
-| `/vendues.html` | ✅ OK |
-
-**Manquant** :
-- Les URLs propres `/catalogue`, `/voitures` (définies dans `vercel.json`) ne sont pas dans le sitemap
-- Les fiches individuelles (`/fiche?id=...`) ne sont pas générées dynamiquement dans le sitemap
-- `lastmod` est codé en dur (2026-06-05) — ne reflète pas les vraies modifications
-
-### 1.3 Balises Canoniques ❌
-
-| Page | Canonical présent |
-|------|------------------|
-| `index.html` | ✅ `https://www.mrautocanada.com` |
-| `catalogue.html` | ❌ Absent |
-| `fiche.html` | ❌ Absent (et la valeur `og:url` est statique, sans `?id=`) |
-| `vendues.html` | ❌ Absent |
-
-### 1.4 Rendu JavaScript — Problème CRITIQUE ❌
-
-**Architecture actuelle** : Tout le contenu HTML visible est généré par `ReactDOM.createRoot(...).render(<App />)` dans un `<div id="root">` initialement vide.
-
-**Conséquences** :
-- Bingbot (et la plupart des crawlers IA) voient : `<div id="root"></div>` — page vide
-- Googlebot peut rendre JS mais avec délai (2nd wave indexing) : risque de non-indexation
-- Les partages sur WhatsApp/Facebook/Twitter/LinkedIn lisent les Open Graph statiques mais pas le contenu dynamique du catalogue
-- La fiche voiture (`fiche.html`) tire ses données depuis Supabase **après** le chargement — meta titre/description ne reflètent JAMAIS la vraie voiture
-
-**Solution recommandée** : SSG (Static Site Generation) ou pré-rendu pour les pages statiques. Pour `fiche.html`, une solution intermédiaire est de mettre à jour dynamiquement le titre via `document.title` + une balise `<meta>` mise à jour côté JS (bénéfice partiel pour Google uniquement).
-
-### 1.5 Performance ❌
-
-**Problèmes identifiés** :
-
-| Fichier | Problème | Impact |
-|---------|----------|--------|
-| `react.development.js` (index.html, catalogue.html) | Build de dev, non minifié ~1 Mo | LCP très lent |
-| `@babel/standalone` (toutes les pages) | Transpilation JSX en temps réel dans le navigateur | TTI +2-4s |
-| Google Fonts (sans `display=swap`) | Render-blocking font loading | CLS, FCP |
-| `fiche.html` / `vendues.html` | Pas de SRI sur les scripts React | Sécurité |
-
-**Points positifs** :
-- ✅ `fetchPriority="high"` sur les images hero
-- ✅ `loading="lazy"` sur les images secondaires
-- ✅ `preconnect` pour Google Fonts et Supabase
-- ✅ `width`/`height` sur la plupart des images (prévention CLS)
-- ✅ Vercel Speed Insights activé
-
-**Estimation CWV** :
-- LCP : ~4-6s (mauvais) — bloqué par React dev + Babel
-- CLS : probablement bon (images dimensionnées)
-- INP : variable selon la machine
-
-### 1.6 En-têtes de Sécurité ⚠️
-
-**Configurés** (`vercel.json`) :
-- ✅ `X-Content-Type-Options: nosniff`
-- ✅ `X-Frame-Options: SAMEORIGIN`
-
-**Manquants** :
-- ❌ `Strict-Transport-Security` (HSTS)
-- ❌ `Content-Security-Policy`
-- ❌ `Referrer-Policy`
-- ❌ `Permissions-Policy`
-
-### 1.7 Intégrité des Sous-ressources (SRI) ⚠️
-
-| Page | SRI React/ReactDOM | SRI Babel |
-|------|--------------------|-----------|
-| `index.html` | ✅ | ✅ |
-| `catalogue.html` | ✅ | ✅ |
-| `fiche.html` | ❌ | ❌ |
-| `vendues.html` | ❌ | ❌ |
-
-### 1.8 URLs propres ✅ Partiel
-
-Les rewrites Vercel sont bien configurés (`/catalogue` → `catalogue.html`), mais :
-- Le sitemap référence les `.html` au lieu des URLs propres
-- Les `<link rel="canonical">` et `og:url` devraient pointer vers les URLs propres
-
-### 1.9 Favicon ⚠️
-- `logo.jpg` utilisé comme favicon — JPEG accepté mais non optimal
-- ❌ Pas de `apple-touch-icon`
-- ❌ Pas de `manifest.json` / Web App Manifest
+### Problèmes moyens
+- **Canonical home** : `https://www.mrautocanada.com` sans slash final → potentielle confusion avec `https://www.mrautocanada.com/`
+- **Sitemap** : fiche.html non listable (conséquence de l'architecture actuelle)
+- **hifi-components.jsx** : chargé sans versioning sur fiche.html (`src="hifi-components.jsx"`) vs `?v=4` sur les autres pages
 
 ---
 
-## 2. Qualité du Contenu
+## 2. Performance
 
-### 2.1 Signaux E-E-A-T
+### Score estimé : 28/100
 
-**Expérience & Expertise** :
-- ✅ "Depuis 2020" — ancienneté mentionnée
-- ✅ "Je sélectionne chaque voiture à la main" — approche personnalisée
-- ✅ "Papiers vérifiés, essai routier, livraison" — garanties concrètes
-- ✅ Section "20+ voitures vendues" avec photos réelles
-- ❌ Pas de nom de personne physique (prénom du vendeur)
-- ❌ Pas de témoignages clients avec noms/photos
-- ❌ Pas de page "À propos" dédiée
+**Babel Standalone = tueur de performance numéro 1**
 
-**Autorité** :
-- ❌ Aucun lien vers profils sociaux dans les métadonnées
-- ✅ Liens TikTok, Instagram, Facebook, Threads dans le footer
-- ❌ Pas de Google Business Profile lié
+| Ressource | Taille (estimée) | Impact |
+|-----------|-----------------|--------|
+| Babel Standalone 7.29 | ~882 KB | Parse + transpile avant tout rendu |
+| React 18 UMD + React DOM | ~1.15 MB | Bloque le rendu initial |
+| Supabase JS | ~150 KB | Bloque l'affichage catalogue |
 
-**Confiance** :
-- ✅ Numéro de téléphone visible
-- ✅ WhatsApp avec vrai numéro
-- ❌ Pas d'adresse physique affichée
-- ❌ Formulaire de contact non fonctionnel (pas de handler `onSubmit`)
+**LCP estimé : 4-6 secondes sur mobile 3G** → Note CWV = Mauvaise
 
-### 2.2 Contenu mince (Thin Content)
-
-| Page | Contenu textuel crawlable | Verdict |
-|------|--------------------------|---------|
-| Homepage (`index.html`) | H1, description, 5 étapes, stats — mais tout rendu JS | ⚠️ Risque |
-| Catalogue | Grille de voitures Supabase — 100% dynamique | ❌ Très mince |
-| Fiche voiture | Détails voiture 100% dynamiques | ❌ Mince |
-| Vendues | Grille de voitures 100% dynamique | ❌ Très mince |
-
-### 2.3 Lisibilité
-- ✅ Texte français clair et direct
-- ✅ Langage naturel et conversationnel ("tu")
-- ✅ Phrases courtes
-- ❌ Pas de contenu éditorial (blog, conseils d'achat, guides)
+### Points positifs
+- `fetchPriority="high"` sur les images hero ✅
+- `loading="lazy"` sur les images below-fold ✅
+- `decoding="async"` ✅
+- `width/height` sur les images (évite le CLS) ✅
+- `link rel="preload"` sur logo.jpg ✅
+- `link rel="preconnect"` sur fonts + Supabase ✅
+- `font-display: swap` via Google Fonts ✅
 
 ---
 
 ## 3. On-Page SEO
 
-### 3.1 Balises Title
+### Titres de page
 
-| Page | Title | Longueur | Qualité |
-|------|-------|----------|---------|
-| Homepage | "Mrauto Canada — Trouvez votre voiture d'occasion à Dakar, sans mauvaise surprise" | 79 chars | ✅ Bon (léger dépassement 60 chars recommandé) |
-| Catalogue | "Catalogue — MRAUTO Canada" | 26 chars | ⚠️ Trop court, peu ciblé |
-| Fiche | "Fiche voiture — MRAUTO Canada" | 30 chars | ❌ Générique, statique |
-| Vendues | "Voitures vendues — MRAUTO Canada" | 33 chars | ⚠️ Acceptable |
+| Page | Longueur | Note |
+|------|----------|------|
+| index.html | 82 chars | ⚠️ Légèrement long (>70) |
+| catalogue.html | 53 chars | Optimal |
+| fiche.html | Variable (JS) | Générique en 1er crawl |
+| vendues.html | 59 chars | Optimal |
 
-### 3.2 Meta Descriptions
+### Meta Descriptions
 
-| Page | Description | Longueur | Qualité |
-|------|-------------|----------|---------|
-| Homepage | "Achetez votre voiture d'occasion à Dakar en toute confiance…" | 160 chars | ✅ Bien |
-| Catalogue | "Catalogue complet des voitures disponibles chez MRAUTO Canada à Dakar…" | 111 chars | ✅ Correct |
-| Fiche | "Fiche détaillée de la voiture — Mrauto Canada à Dakar. Prix, kilométrage…" | 109 chars | ❌ Générique, même desc pour toutes fiches |
-| Vendues | "Toutes les voitures vendues par MRAUTO Canada à Dakar. Chaque transaction, un client heureux." | 93 chars | ✅ Correct |
+| Page | Note |
+|------|------|
+| index.html | Excellente — USPs clairs, mots-clés présents |
+| catalogue.html | Bonne |
+| fiche.html | Générique statique indexée par Google |
+| vendues.html | Thin — 95 chars sans mots-clés forts |
 
-### 3.3 Structure des titres H1/H2
+### Structure des titres (H1/H2)
+- H1 sur toutes les pages ✅
+- index.html : H1 contient "Dakar" (keyword local) ✅
+- catalogue.html : Pas de H2 sous le H1 ⚠️
 
-| Page | H1 | H2s |
-|------|----|----|
-| Homepage | "Le bon choix de voiture à Dakar." | "Une voiture en tête ? Écris-moi maintenant.", "Une question ?" |
-| Catalogue | "Toutes nos voitures disponibles" | Aucun |
-| Fiche | Nom de la voiture dynamique | Aucun |
-| Vendues | "Toutes nos voitures vendues" | "Votre prochain véhicule vous attend." |
+### Open Graph
+- Toutes les pages ont les balises OG et Twitter Card ✅
+- **OG image** : `logo.jpg` (1170×990) sur toutes les pages — ratio incorrect (devrait être 1200×630) ❌
+- Même image sur toutes les pages (pas de différenciation) ❌
 
-**Note** : Les H1/H2 sont corrects structurellement mais uniquement visibles avec JS.
+### Liens internes
 
-### 3.4 Open Graph
-
-| Page | og:title | og:desc | og:image | og:url | og:locale | Twitter Card |
-|------|----------|---------|----------|--------|-----------|-------------|
-| Homepage | ✅ | ✅ | ✅ logo.jpg | ✅ | ✅ fr_SN | ✅ |
-| Catalogue | ✅ | ✅ | ✅ logo.jpg | ✅ | ❌ manquant | ❌ |
-| Fiche | ✅ statique | ✅ statique | ✅ logo.jpg | ❌ statique sans id | ❌ | ❌ |
-| Vendues | ✅ | ✅ | ✅ logo.jpg | ✅ | ❌ | ❌ |
-
-**Problème image OG** : `logo.jpg` est en `1170×990` (format carré). Facebook et WhatsApp requièrent `1200×630` (ratio 1.91:1) pour un affichage optimal. Le logo n'est pas une image de partage social efficace.
-
-### 3.5 Cohérence de la casse — ⚠️ Incohérence de marque
-
-| Occurrence | Casse utilisée |
-|------------|---------------|
-| `<title>` homepage | "Mrauto Canada" |
-| `<title>` autres pages | "MRAUTO Canada" |
-| Footer | "MRAUTO Canada" |
-| Nav logo alt | "MRAUTO Canada" |
-| og:site_name | "Mrauto Canada" |
-
-Choisir une convention et l'appliquer partout.
-
-### 3.6 Maillage interne ✅
-
-- ✅ Bonne navigation inter-pages (Home ↔ Catalogue ↔ Fiche ↔ Vendues)
-- ✅ Breadcrumb visuel (← Retour / ← Catalogue)
-- ❌ Pas de breadcrumb schema
-- ❌ Les liens vers les fiches individuelles sont générés dynamiquement par React
+| Lien | Présent |
+|------|---------|
+| Home → Catalogue | ✅ |
+| Home → Vendues | ✅ |
+| Home → Contact (ancre) | ✅ |
+| Catalogue → Fiche voiture | ✅ |
+| Catalogue → Vendues | ✅ |
+| Vendues → Catalogue | ✅ |
+| Fiche → "Voir aussi" | ❌ |
 
 ---
 
-## 4. Schéma / Données Structurées — ABSENT ❌
+## 4. Schémas / Données Structurées
 
-**Aucun markup JSON-LD présent sur aucune page.**
+### index.html — 85/100
+- `AutoDealer + LocalBusiness` ✅ — complet avec telephone, address, areaServed, openingHours, sameAs, logo, foundingDate, priceRange
+- `FAQPage` ✅ — 4 questions correspondant au contenu visible
+- `WebSite + SearchAction` ❌ — manquant
+- `AggregateRating` ❌ — "20+ clients" affiché mais pas structuré
 
-### Opportunités manquées (haute valeur)
+### catalogue.html — 50/100
+- `BreadcrumbList` ✅
+- `ItemList` des voitures ❌
 
-| Schema | Page | Impact |
-|--------|------|--------|
-| `Organization` | Toutes | Panneau Knowledge Graph Google |
-| `LocalBusiness` + `AutoDealer` | Homepage | Rich results locaux, carte Google |
-| `Car` + `Product` + `Offer` | fiche.html | Rich results produit, prix en SERP |
-| `ItemList` | catalogue.html | Sitelinks en SERP |
-| `BreadcrumbList` | catalogue.html, fiche.html | Fil d'Ariane en SERP |
-| `FAQPage` | Homepage | Expanded results en SERP |
+### fiche.html — 70/100
+- `Car` + `BreadcrumbList` ✅ — mais injectés par JS (risque de non-indexation)
 
----
-
-## 5. Performance — Core Web Vitals (estimations)
-
-### Architecture de chargement actuelle
-
-```
-1. HTML initial (vide — juste <div id="root">)
-2. react.development.js      ← ~1 000 Ko, non minifié
-3. react-dom.development.js  ← ~1 000 Ko, non minifié  
-4. @babel/standalone          ← ~850 Ko, transpile JSX in-browser
-5. supabase-js               ← ~200 Ko
-6. hifi-components.jsx       ← transpilé par Babel
-7. Appel API Supabase        ← données voitures
-8. Rendu React              ← contenu visible
-```
-
-**Total bloquant avant premier affichage** : ~3+ Mo de JavaScript
-
-| Métrique | Estimation | Cible Google |
-|---------|------------|-------------|
-| LCP | 5-8s ❌ | < 2,5s |
-| INP | 200-500ms ❌ | < 200ms |
-| CLS | ~0,05 ✅ | < 0,1 |
-| FCP | 3-5s ❌ | < 1,8s |
-
-**Solution radicale** : Passer à un bundler (Vite) avec compilation au build time. Le gain estimé est de -70% sur le poids JS et LCP < 2s.
+### vendues.html — 0/100
+- Aucun schema ❌
 
 ---
 
-## 6. Préparation IA et Recherche GEO
+## 5. Qualité de Contenu / E-E-A-T
 
-### 6.1 llms.txt ❌
-Pas de fichier `/llms.txt`. Les assistants IA (ChatGPT, Perplexity, Claude) ne peuvent pas découvrir le site facilement.
+### Signaux E-E-A-T
 
-### 6.2 Accessibilité aux crawlers IA
-- ❌ Contenu rendu JS → non citable par les LLM
-- ❌ Pas de signaux d'autorité lisibles statiquement
-- ❌ Pas de FAQ, pas de Q&R structurées
+| Signal | Présent | Note |
+|--------|---------|------|
+| Date de fondation (2020) | ✅ | Expérience établie |
+| Voix personnelle ("je sélectionne à la main") | ✅ | Authenticité |
+| Social proof "20+ clients" | ✅ | Preuve sociale quantifiée |
+| Numéro de téléphone visible | ✅ | Transparence |
+| Adresse physique complète | ❌ | "Dakar, Sénégal" uniquement |
+| Témoignages textuels de clients | ❌ | Aucun |
+| Page "À propos" | ❌ | Inexistante |
+| Identité du propriétaire | Partiel | "je" mais pas de nom/photo |
 
-### 6.3 Recommandations GEO
-- Créer `/llms.txt` avec nom, activité, localisation, numéro et URL
-- Ajouter des sections FAQ avec questions explicites ("Comment acheter une voiture à Dakar ?")
-- Structurer les pages avec des réponses directes (passage-level citability)
+### Contenu par page
 
----
+**index.html** — Bonne densité : hero, stats, démarche 5 étapes, social proof, FAQ, contact ✅  
+**catalogue.html** — Quasi-nul hors voitures Supabase, pas de texte descriptif ⚠️  
+**fiche.html** — 100% dynamique Supabase, aucun contenu statique riche ⚠️  
+**vendues.html** — Grille de photos uniquement, pas de contenu textuel ⚠️
 
-## 7. Images
-
-### 7.1 Alt texts
-
-| Contexte | Alt text | Qualité |
-|----------|----------|---------|
-| Logo nav | "MRAUTO Canada" | ✅ |
-| Voiture vedette hero | `${featuredCar.brand} ${featuredCar.model}` | ✅ Bon |
-| Images galerie fiche | `${brand} ${model} — photo ${idx+1}` | ✅ Acceptable |
-| Images vendues grid | `${car.brand} ${car.model}` | ✅ OK |
-| Thumbnails galerie | `""` (vide) | ✅ Décoratif → correct |
-
-### 7.2 Dimensions et format
-
-- ✅ Attributs `width`/`height` présents → prévention CLS
-- ✅ `loading="lazy"` sur les images non-critiques
-- ✅ `fetchPriority="high"` sur LCP
-- ❌ Format JPEG probable pour toutes les images (vs WebP/AVIF)
-- ❌ Image OG (logo.jpg) : 1170×990 au lieu de 1200×630
-
-### 7.3 Favicon
-- Logo.jpg utilisé comme favicon — JPEG est supporté mais non optimal
-- ❌ Pas d'`apple-touch-icon`
-- ❌ Pas de manifest
+### Opportunités de contenu manquées
+1. Blog/articles : "Comment acheter voiture occasion Dakar", "Import Canada → Sénégal"
+2. Section témoignages textuels avec noms et photos
+3. Page "À propos" avec profil du fondateur
 
 ---
 
-## 8. SEO Local
+## 6. Local SEO
 
-### 8.1 Signaux locaux présents
-- ✅ "Dakar, Sénégal" mentionné en texte
-- ✅ "Depuis 2020" — ancienneté
-- ✅ Numéro sénégalais (+221 77 834 64 64)
-- ✅ WhatsApp activé
-- ✅ Liens réseaux sociaux (TikTok, Instagram, Facebook, Threads)
+### NAP (Name, Address, Phone)
 
-### 8.2 Signaux locaux manquants
-- ❌ Pas d'adresse physique
-- ❌ Pas de schéma `LocalBusiness` / `AutoDealer`
-- ❌ Pas d'horaires d'ouverture
-- ❌ Pas de Google Business Profile référencé
-- ❌ Pas de cohérence NAP (Name, Address, Phone) structurée
+| Élément | Valeur | Note |
+|---------|--------|------|
+| Nom | "Mrauto Canada" / "MRAUTO Canada" | ⚠️ Casse variable |
+| Adresse | "Dakar, Sénégal" | ❌ Pas de rue/quartier |
+| Téléphone | +221 77 834 64 64 | ✅ Cohérent |
+
+**Problème de casse :** "Mrauto Canada" dans le schéma JSON-LD mais "MRAUTO Canada" dans l'UI → incohérence NAP mineure.
+
+### Google Business Profile
+- Aucun lien GBP sur le site ❌
+- Aucune intégration d'avis Google ❌
+- Sans GBP optimisé → absent du Local Pack Google Maps "concessionnaire Dakar"
 
 ---
 
-## Annexe : Inventaire des fichiers SEO-critiques
+## 7. Sécurité
 
-| Fichier | Canonical | Twitter Card | Schema | SRI | Notes |
-|---------|-----------|-------------|--------|-----|-------|
-| `index.html` | ✅ | ✅ | ❌ | ✅ | React dev mode |
-| `catalogue.html` | ❌ | ❌ | ❌ | ✅ | React dev mode |
-| `fiche.html` | ❌ | ❌ | ❌ | ❌ | Meta statiques, React prod |
-| `vendues.html` | ❌ | ❌ | ❌ | ❌ | Composants inline |
-| `robots.txt` | — | — | — | — | ✅ Correct |
-| `sitemap.xml` | — | — | — | — | ⚠️ fiche.html sans paramètre |
-| `vercel.json` | — | — | — | — | ⚠️ Headers sécurité incomplets |
+### Headers HTTP (vercel.json)
+
+| Header | État |
+|--------|------|
+| X-Content-Type-Options | ✅ |
+| X-Frame-Options | ✅ |
+| Strict-Transport-Security | ✅ Excellent |
+| Referrer-Policy | ✅ |
+| Permissions-Policy | ✅ |
+| Content-Security-Policy | ❌ ABSENT |
+
+### Exposition Supabase
+- Clé anon `sb_publishable_*` visible dans le code HTML — normal pour une clé publique MAIS les Row Level Security (RLS) doivent impérativement être configurées côté Supabase.
+
+### Admin exposé
+- `admin.html` non bloqué dans robots.txt → indexable par Google ❌
+
+---
+
+## 8. AI Search Readiness (GEO)
+
+### llms.txt — Score : 55/100
+- Présent ✅ mais trop succinct (19 lignes)
+- Manque : processus d'achat détaillé, FAQ, modèles disponibles, zones de livraison, fourchettes de prix
+
+### Accessibilité aux crawlers IA
+- Aucun blocage de GPTBot/PerplexityBot → les LLMs peuvent citer le site ✅
+- Contenu structuré (FAQ, schema) favorise les réponses IA ✅
+- Contenu dynamique Supabase non accessible aux crawlers IA sans JS ❌
+
+---
+
+## 9. Images
+
+| Aspect | État |
+|--------|------|
+| OG Image dimensions | ❌ 1170×990 (devrait être 1200×630) |
+| OG Image unique par page | ❌ Logo identique sur toutes les pages |
+| Alt text logo | ✅ "MRAUTO Canada" |
+| Alt text voitures | ✅ Dynamique (brand + model) |
+| Alt text thumbnails galerie | ✅ `alt=""` correct |
+| Format WebP/AVIF | ⚠️ Non contrôlable (Supabase CDN) |
+
+---
+
+## 10. Sitemap & Crawlabilité
+
+| Aspect | État |
+|--------|------|
+| sitemap.xml présent | ✅ |
+| Déclaré dans robots.txt | ✅ |
+| URLs propres sans .html | ✅ (rewrites Vercel) |
+| Page vendues dans sitemap | ✅ |
+| Page fiche dans sitemap | ❌ (architecturalement impossible en CSR) |
+| lastmod cohérentes | ✅ 2026-06-11 |
+
+---
+
+## Annexe : Inventaire des pages
+
+| Page | Crawlable | Indexable | Schema | OG complète | Sitemap |
+|------|-----------|-----------|--------|-------------|---------|
+| / (home) | ✅ | ✅ | ✅ AutoDealer + FAQ | ⚠️ logo seul | ✅ |
+| /catalogue | ✅ | ✅ | ⚠️ BreadcrumbList | ⚠️ logo seul | ✅ |
+| /fiche?id=X | ✅ | ❌ Générique | ⚠️ Dynamique JS | ⚠️ logo seul | ❌ |
+| /vendues | ✅ | ✅ | ❌ Aucun | ⚠️ logo seul | ✅ |
+| /admin | ✅ | ⚠️ Non bloqué | ❌ | ❌ | ❌ |
+
+---
+
+*Rapport généré le 14 juin 2026 — Mrauto Canada SEO Audit v2.0*
