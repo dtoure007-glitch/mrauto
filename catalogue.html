@@ -167,11 +167,11 @@
               <>
                 <div style={{ display: 'flex', gap: 28 }}>
                   <a href="/"
-                    onClick={e => { e.preventDefault(); goBack('index.html'); }}
+                    onClick={e => { e.preventDefault(); goBack('/'); }}
                     style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
                     onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
                     onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>← Accueil</a>
-                  {[['Vendues', 'vendues.html'], ['Contact', 'index.html#contact']].map(([l, h]) =>
+                  {[['Vendues', '/vendues'], ['Contact', '/#contact']].map(([l, h]) =>
                     <a key={l} href={h} style={{ fontFamily: 'var(--font-body)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.15s' }}
                       onMouseEnter={e => e.currentTarget.style.color = 'var(--text)'}
                       onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>{l}</a>
@@ -186,11 +186,11 @@
           {isMobile && open && (
             <div style={{ background: 'var(--nav-bg)', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
               <a href="/"
-                onClick={e => { e.preventDefault(); setOpen(false); goBack('index.html'); }}
+                onClick={e => { e.preventDefault(); setOpen(false); goBack('/'); }}
                 style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                 ← Accueil
               </a>
-              {[['Vendues', 'vendues.html'], ['Contact', 'index.html#contact']].map(([l, h]) => (
+              {[['Vendues', '/vendues'], ['Contact', '/#contact']].map(([l, h]) => (
                 <a key={l} href={h} onClick={() => setOpen(false)}
                   style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', fontFamily: 'var(--font-body)', fontSize: 14, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--text)', textDecoration: 'none', borderBottom: '1px solid var(--border)' }}>
                   {l}
@@ -211,6 +211,26 @@
     function Page() {
       const { cars, loading } = useCars();
       const isMobile = useIsMobile();
+
+      const [query, setQuery] = React.useState(
+        () => new URLSearchParams(window.location.search).get('q') || ''
+      );
+
+      React.useEffect(() => {
+        const url = new URL(window.location.href);
+        if (query.trim()) { url.searchParams.set('q', query.trim()); }
+        else { url.searchParams.delete('q'); }
+        history.replaceState(null, '', url);
+      }, [query]);
+
+      const filtered = React.useMemo(() => {
+        if (!query.trim()) return cars;
+        const q = query.toLowerCase().trim();
+        return cars.filter(c =>
+          [c.brand, c.model, String(c.year ?? ''), c.fuel, c.color, c.transmission]
+            .some(v => v && String(v).toLowerCase().includes(q))
+        );
+      }, [cars, query]);
 
       return (
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
@@ -236,8 +256,39 @@
                   </div>
                   {!loading && !isMobile && (
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'var(--accent)', lineHeight: 1, letterSpacing: '-0.02em', flexShrink: 0 }}>
-                      {cars.length}<span style={{ fontSize: 20, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)', marginLeft: 8, verticalAlign: 'middle' }}>dispo</span>
+                      {filtered.length}<span style={{ fontSize: 20, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)', marginLeft: 8, verticalAlign: 'middle' }}>dispo</span>
                     </div>
+                  )}
+                </div>
+
+                {/* ── SEARCH BAR ──────────────────────────────────────────── */}
+                <div style={{ marginTop: 32, position: 'relative', maxWidth: 560 }}>
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    placeholder="Rechercher une marque, modèle, année…"
+                    aria-label="Rechercher dans le catalogue"
+                    style={{
+                      width: '100%',
+                      padding: '14px 48px 14px 18px',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: 15,
+                      color: '#fff',
+                      background: 'rgba(255,255,255,0.07)',
+                      border: '1px solid rgba(255,255,255,0.18)',
+                      borderRadius: 0,
+                      outline: 'none',
+                      appearance: 'none',
+                    }}
+                    onFocus={e => e.target.style.borderColor = 'var(--accent-on-dark)'}
+                    onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.18)'}
+                  />
+                  {query ? (
+                    <button onClick={() => setQuery('')} aria-label="Effacer la recherche"
+                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 18, cursor: 'pointer', lineHeight: 1 }}>✕</button>
+                  ) : (
+                    <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.3)', fontSize: 16, pointerEvents: 'none' }}>⌕</span>
                   )}
                 </div>
               </div>
@@ -252,22 +303,32 @@
                 <div style={{ textAlign: 'center', padding: '80px 0', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   Chargement du catalogue…
                 </div>
-              ) : cars.length === 0 ? (
+              ) : filtered.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px 0' }}>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text)', marginBottom: 14 }}>
-                    Aucune voiture disponible pour le moment
+                    {query ? `Aucun résultat pour "${query}"` : 'Aucune voiture disponible pour le moment'}
                   </div>
                   <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--text-muted)', marginBottom: 36, lineHeight: 1.6 }}>
-                    Revenez bientôt ou contactez-nous directement.
+                    {query ? 'Essayez une autre marque ou modèle, ou contactez-nous directement.' : 'Revenez bientôt ou contactez-nous directement.'}
                   </p>
+                  {query ? (
+                    <HifiBtn variant="outline" onClick={() => setQuery('')} style={{ marginRight: 12 }}>Voir tout le catalogue</HifiBtn>
+                  ) : null}
                   <HifiBtn variant="whatsapp" href="https://wa.me/221778346464" style={{ gap: 8 }}>
                     <WaIcon size={15} /> Écrire sur WhatsApp
                   </HifiBtn>
                 </div>
               ) : (
-                <div className="cars-grid">
-                  {cars.map((c, i) => <CarCard key={c.id} index={i} {...c} />)}
-                </div>
+                <>
+                  {query && (
+                    <p style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-muted)', marginBottom: 24, letterSpacing: '0.06em' }}>
+                      {filtered.length} résultat{filtered.length > 1 ? 's' : ''} pour <strong style={{ color: 'var(--text)' }}>"{query}"</strong>
+                    </p>
+                  )}
+                  <div className="cars-grid">
+                    {filtered.map((c, i) => <CarCard key={c.id} index={i} {...c} />)}
+                  </div>
+                </>
               )}
             </div>
           </main>
