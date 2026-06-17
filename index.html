@@ -213,7 +213,223 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root"><!-- SEO SKELETON — remplacé par React au chargement, lu par Google immédiatement -->
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;height:68px;background:rgba(255,255,255,0.97);border-bottom:1px solid rgba(17,17,17,0.1);display:flex;align-items:center;padding:0 56px;justify-content:space-between;">
+    <a href="/" style="display:flex;align-items:center;gap:12px;text-decoration:none;">
+      <img src="logo.jpg" alt="MRAUTO Canada — vente de voitures d'occasion à Dakar" width="48" height="48" style="height:48px;width:48px;border-radius:50%;object-fit:cover;object-position:center;">
+    </a>
+    <div style="display:flex;gap:32px;">
+      <a href="#voitures" style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,17,17,0.5);text-decoration:none;">Voitures</a>
+      <a href="#vendues" style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,17,17,0.5);text-decoration:none;">Vendues</a>
+      <a href="#demarche" style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,17,17,0.5);text-decoration:none;">Démarche</a>
+      <a href="#contact" style="font-family:'Barlow',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(17,17,17,0.5);text-decoration:none;">Contact</a>
+    </div>
+    <a href="https://wa.me/221778346464" style="display:inline-flex;align-items:center;gap:6px;background:#25D366;color:#fff;font-family:'Barlow',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:9px 18px;text-decoration:none;">WhatsApp</a>
+  </nav>
+
+  <section class="hero-grid" style="display:grid;grid-template-columns:2fr 3fr;min-height:100vh;padding-top:68px;">
+    <div style="position:relative;display:flex;flex-direction:column;justify-content:center;padding:80px 64px 80px 68px;background:#fff;border-right:1px solid rgba(17,17,17,0.1);">
+      <div style="position:absolute;left:0;top:12%;height:76%;width:3px;background:#E2001A;"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+        <div style="height:2px;width:20px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">Dakar, Sénégal · Depuis 2020</span>
+      </div>
+      <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(48px,6.5vw,96px);font-weight:900;color:#111;line-height:0.93;letter-spacing:0.01em;text-transform:uppercase;margin:0 0 24px;">
+        Le bon choix<br>de voiture<br>à Dakar.
+      </h1>
+      <p style="font-family:'Barlow',sans-serif;font-size:16px;color:rgba(17,17,17,0.6);line-height:1.72;max-width:450px;margin:0 0 24px;">
+        Depuis 2020, je sélectionne chaque voiture à la main.<br>Papiers vérifiés, essai routier, livraison — tout compris.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;">
+        <span style="display:inline-flex;align-items:center;padding:6px 13px;background:rgba(226,0,26,0.07);border:1px solid rgba(17,17,17,0.1);font-family:'Barlow',sans-serif;font-size:12px;font-weight:500;">✓ Papiers vérifiés</span>
+        <span style="display:inline-flex;align-items:center;padding:6px 13px;background:rgba(226,0,26,0.07);border:1px solid rgba(17,17,17,0.1);font-family:'Barlow',sans-serif;font-size:12px;font-weight:500;">✓ Essai gratuit</span>
+        <span style="display:inline-flex;align-items:center;padding:6px 13px;background:rgba(226,0,26,0.07);border:1px solid rgba(17,17,17,0.1);font-family:'Barlow',sans-serif;font-size:12px;font-weight:500;">✓ Livraison domicile</span>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="#voitures" style="display:inline-flex;align-items:center;justify-content:center;background:#E2001A;color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:17px 38px;text-decoration:none;">Voir le catalogue ↓</a>
+        <a href="https://wa.me/221778346464" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:17px 38px;text-decoration:none;">WhatsApp</a>
+      </div>
+      <div style="font-family:'Barlow',sans-serif;font-size:11px;color:rgba(17,17,17,0.5);letter-spacing:0.06em;text-transform:uppercase;margin-top:16px;">Réponse en moins d'1h · 7j/7</div>
+    </div>
+    <div class="hero-img" style="background:linear-gradient(150deg,#d0d0d0,#b8b8b8);min-height:480px;"></div>
+  </section>
+
+  <section style="background:#111111;">
+    <div style="height:2px;background:#E2001A;"></div>
+    <div class="max-w stats-grid" style="display:grid;grid-template-columns:repeat(3,1fr);">
+      <div style="padding:52px 40px;text-align:center;border-right:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;color:#ff4d4d;line-height:1;text-transform:uppercase;letter-spacing:-0.02em;">20+</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:0.06em;text-transform:uppercase;">voitures vendues</div>
+      </div>
+      <div style="padding:52px 40px;text-align:center;border-right:1px solid rgba(255,255,255,0.08);">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;color:#ff4d4d;line-height:1;text-transform:uppercase;letter-spacing:-0.02em;">6 ans</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:0.06em;text-transform:uppercase;">d'expérience à Dakar</div>
+      </div>
+      <div style="padding:52px 40px;text-align:center;">
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:80px;font-weight:900;color:#ff4d4d;line-height:1;text-transform:uppercase;letter-spacing:-0.02em;">100%</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:0.06em;text-transform:uppercase;">clients livrés</div>
+      </div>
+    </div>
+    <div style="height:2px;background:#E2001A;"></div>
+  </section>
+
+  <section id="voitures" class="sec" style="background:#fff;">
+    <div class="max-w">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="height:2px;width:22px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">catalogue</span>
+      </div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,5.5vw,56px);font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.015em;margin:0 0 16px;line-height:0.95;">Voitures disponibles</h2>
+      <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.55);line-height:1.65;max-width:560px;margin:0 0 44px;">
+        Sélection de voitures d'occasion à vendre à Dakar, Sénégal. Mise à jour régulièrement. Véhicules importés du Canada, inspectés, papiers vérifiés, dédouanés, avec essai routier gratuit.
+      </p>
+      <a href="/catalogue" style="display:inline-flex;align-items:center;justify-content:center;background:#E2001A;color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:13px 26px;text-decoration:none;">Voir tout le catalogue →</a>
+    </div>
+  </section>
+
+  <section id="demarche" class="sec" style="background:#f5f5f5;">
+    <div class="max-w">
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;">
+        <div style="height:2px;width:22px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">démarche</span>
+        <div style="height:2px;width:22px;background:#E2001A;flex-shrink:0;"></div>
+      </div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,5.5vw,56px);font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.015em;text-align:center;margin:0 0 44px;line-height:0.95;">En 5 étapes, c'est plié.</h2>
+      <ol class="demarche-grid" style="list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+        <li style="background:#fff;border:1px solid rgba(17,17,17,0.1);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:3px;background:#E2001A;"></div>
+          <div style="padding:24px 20px 28px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:rgba(17,17,17,0.08);line-height:1;margin-bottom:14px;letter-spacing:-0.02em;">01</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:8px;">Tu écris</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(17,17,17,0.6);line-height:1.6;margin:0;">WhatsApp ou formulaire — tu auras ma réponse en moins d'1h.</p>
+          </div>
+        </li>
+        <li style="background:#fff;border:1px solid rgba(17,17,17,0.1);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:3px;background:#E2001A;"></div>
+          <div style="padding:24px 20px 28px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:rgba(17,17,17,0.08);line-height:1;margin-bottom:14px;letter-spacing:-0.02em;">02</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:8px;">Rendez-vous</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(17,17,17,0.6);line-height:1.6;margin:0;">On choisit ensemble un créneau qui t'arrange.</p>
+          </div>
+        </li>
+        <li style="background:#fff;border:1px solid rgba(17,17,17,0.1);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:3px;background:#E2001A;"></div>
+          <div style="padding:24px 20px 28px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:rgba(17,17,17,0.08);line-height:1;margin-bottom:14px;letter-spacing:-0.02em;">03</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:8px;">Essai routier</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(17,17,17,0.6);line-height:1.6;margin:0;">Tu prends le volant. Aucune pression, aucun engagement.</p>
+          </div>
+        </li>
+        <li style="background:#fff;border:1px solid rgba(17,17,17,0.1);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:3px;background:#E2001A;"></div>
+          <div style="padding:24px 20px 28px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:rgba(17,17,17,0.08);line-height:1;margin-bottom:14px;letter-spacing:-0.02em;">04</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:8px;">Vérification</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(17,17,17,0.6);line-height:1.6;margin:0;">On vérifie tout ensemble — papiers, mécanique. Zéro surprise.</p>
+          </div>
+        </li>
+        <li style="background:#fff;border:1px solid rgba(17,17,17,0.1);overflow:hidden;display:flex;flex-direction:column;">
+          <div style="height:3px;background:#E2001A;"></div>
+          <div style="padding:24px 20px 28px;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;color:rgba(17,17,17,0.08);line-height:1;margin-bottom:14px;letter-spacing:-0.02em;">05</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin-bottom:8px;">Tu repars</div>
+            <p style="font-family:'Barlow',sans-serif;font-size:13px;color:rgba(17,17,17,0.6);line-height:1.6;margin:0;">Tu repars avec ta voiture — livraison à domicile ou retrait sur place.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="vendues" class="sec" style="background:#fff;">
+    <div class="max-w">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <div style="height:2px;width:20px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">social proof</span>
+      </div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,5.5vw,56px);font-weight:900;color:#111;text-transform:uppercase;margin:0 0 16px;line-height:0.95;">20+ voitures livrées,<br>20+ clients heureux.</h2>
+      <p style="font-family:'Barlow',sans-serif;font-size:14px;color:rgba(17,17,17,0.6);line-height:1.7;margin:0 0 28px;max-width:560px;">Chaque photo = un client livré, une transaction réussie. Achat de voiture d'occasion à Dakar en toute confiance. Aucune arnaque, aucun vice caché.</p>
+      <a href="/vendues" style="display:inline-flex;align-items:center;background:transparent;color:#E2001A;border:1.5px solid #E2001A;font-family:'Barlow',sans-serif;font-weight:700;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;padding:13px 26px;text-decoration:none;">Voir toutes les livraisons →</a>
+    </div>
+  </section>
+
+  <section style="background:#111111;padding:0 60px;">
+    <div style="height:2px;background:#E2001A;"></div>
+    <div style="max-width:780px;margin:0 auto;padding:88px 0;text-align:center;">
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(44px,5vw,76px);font-weight:900;color:#fff;line-height:0.95;text-transform:uppercase;letter-spacing:0.01em;margin:0 0 22px;">
+        Une voiture en tête ?<br>Écris-moi maintenant.
+      </h2>
+      <p style="font-family:'Barlow',sans-serif;font-size:16px;color:rgba(255,255,255,0.42);line-height:1.7;margin:0 0 38px;">
+        Je réponds en moyenne sous 1h, 7j/7.<br>WhatsApp ou appel, selon ta préférence.
+      </p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+        <a href="https://wa.me/221778346464" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:17px 38px;text-decoration:none;">Écrire sur WhatsApp</a>
+        <a href="tel:+221778346464" style="display:inline-flex;align-items:center;background:transparent;color:rgba(255,255,255,0.88);font-family:'Barlow',sans-serif;font-weight:700;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;padding:17px 38px;border:1px solid rgba(255,255,255,0.3);text-decoration:none;">☎ Appeler</a>
+      </div>
+    </div>
+    <div style="height:2px;background:#E2001A;"></div>
+  </section>
+
+  <section style="background:#fff;padding:0 60px;">
+    <div style="max-width:800px;margin:0 auto;padding:80px 0;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <div style="height:2px;width:20px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">faq</span>
+      </div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(32px,4vw,56px);font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.01em;margin:0 0 40px;">Questions fréquentes</h2>
+      <div style="border-top:1px solid rgba(17,17,17,0.1);">
+        <div style="padding:20px 0;border-bottom:1px solid rgba(17,17,17,0.1);">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin:0 0 10px;">Comment acheter une voiture chez Mrauto Canada ?</h3>
+          <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.6);line-height:1.7;margin:0;">Choisissez votre voiture dans le catalogue, contactez-nous par WhatsApp ou formulaire, puis on organise un essai routier. Les papiers et le dédouanement sont inclus dans le prix.</p>
+        </div>
+        <div style="padding:20px 0;border-bottom:1px solid rgba(17,17,17,0.1);">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin:0 0 10px;">Proposez-vous un essai routier ?</h3>
+          <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.6);line-height:1.7;margin:0;">Oui, l'essai routier est gratuit et inclus pour tous nos véhicules. Il se déroule à Dakar sur rendez-vous, selon vos disponibilités.</p>
+        </div>
+        <div style="padding:20px 0;border-bottom:1px solid rgba(17,17,17,0.1);">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin:0 0 10px;">Livrez-vous à domicile à Dakar ?</h3>
+          <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.6);line-height:1.7;margin:0;">Oui, nous assurons la livraison à domicile partout à Dakar et dans ses environs, sans frais supplémentaires.</p>
+        </div>
+        <div style="padding:20px 0;border-bottom:1px solid rgba(17,17,17,0.1);">
+          <h3 style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;color:#111;text-transform:uppercase;letter-spacing:0.02em;margin:0 0 10px;">Les papiers sont-ils vérifiés ?</h3>
+          <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.6);line-height:1.7;margin:0;">Absolument. Chaque véhicule est dédouané et ses documents officiels sont vérifiés avant la vente. Aucune mauvaise surprise, aucun vice caché.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="sec" style="background:#f5f5f5;">
+    <div class="max-w">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+        <div style="height:2px;width:22px;background:#E2001A;flex-shrink:0;"></div>
+        <span style="font-family:'Barlow',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#E2001A;">contact</span>
+      </div>
+      <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:clamp(26px,5.5vw,56px);font-weight:900;color:#111;text-transform:uppercase;letter-spacing:0.015em;margin:0 0 12px;line-height:0.95;">Achetez votre voiture d'occasion à Dakar</h2>
+      <p style="font-family:'Barlow',sans-serif;font-size:15px;color:rgba(17,17,17,0.6);line-height:1.65;max-width:560px;margin:0 0 24px;">Concessionnaire de voitures d'occasion à Dakar, Sénégal. Je réponds personnellement à chaque message, en moins d'1h, 7j/7.</p>
+      <p style="font-family:'Barlow',sans-serif;font-size:14px;color:#111;margin:0 0 8px;"><strong>Téléphone / WhatsApp :</strong> <a href="tel:+221778346464" style="color:#E2001A;text-decoration:none;">+221 77 834 64 64</a></p>
+      <p style="font-family:'Barlow',sans-serif;font-size:14px;color:#111;margin:0;"><strong>Localisation :</strong> Dakar, Sénégal</p>
+    </div>
+  </section>
+
+  <footer style="background:#111111;">
+    <div style="height:3px;background:#E2001A;"></div>
+    <div style="padding:44px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <img src="logo.jpg" alt="MRAUTO Canada" loading="lazy" width="52" height="52" style="height:52px;width:52px;border-radius:50%;object-fit:cover;">
+        <div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#fff;font-weight:900;letter-spacing:0.08em;text-transform:uppercase;line-height:1.1;">MRAUTO Canada</div>
+          <div style="font-family:'Barlow',sans-serif;font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:0.1em;text-transform:uppercase;">Dakar, Sénégal · Depuis 2020</div>
+        </div>
+      </div>
+      <nav aria-label="Footer" style="display:flex;gap:28px;">
+        <a href="/catalogue" style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;">Catalogue</a>
+        <a href="/vendues" style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;">Vendues</a>
+        <a href="#demarche" style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;">Démarche</a>
+        <a href="#contact" style="font-family:'Barlow',sans-serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;">Contact</a>
+      </nav>
+      <div style="font-family:'Barlow',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);letter-spacing:0.08em;text-transform:uppercase;">© 2026 MRAUTO CANADA</div>
+    </div>
+  </footer>
+  </div>
   <script type="text/babel" src="tweaks-panel.jsx?v=3"></script>
   <script type="text/babel" src="hifi-components.jsx?v=4"></script>
 
