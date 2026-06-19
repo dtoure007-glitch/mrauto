@@ -25,20 +25,19 @@ Priorités par impact/effort. Voir `FULL-AUDIT-REPORT.md` pour le détail.
    canonical par voiture côté serveur, et génération du `sitemap.xml` incluant chaque voiture en stock
    (depuis Supabase). Mettre à jour `vercel.json`.
 
-4. **[H3] Créer une image OG 1200×630 dédiée** (depuis `og-image-generator.html`), l'enregistrer
-   (`og-image.jpg`) et pointer `og:image` dessus sur toutes les pages. Vérifier l'aperçu WhatsApp.
+4. ~~**[H3] Créer une image OG 1200×630 dédiée**~~ ✅ `og-image.svg` créé (1200×630), toutes les pages mises à jour.
 
 ---
 
 ## 🟡 Moyen — sous 1 mois
 
-5. **[M2]** Compléter le schema `LocalBusiness` : `streetAddress`, `geo` (lat/long), lien Google Business Profile.
-   Créer/optimiser la fiche GBP (avis, photos, horaires) — décisif pour le local pack à Dakar.
-6. **[M1]** Schema `CollectionPage`/`ItemList` sur catalogue et vendues ; `AggregateRating` si avis réels.
-7. **[M3]** Gérer les URLs `?q=` : canonical vers `/catalogue` ou `noindex` des résultats filtrés.
+5. **[M2]** ~~Compléter le schema `LocalBusiness`~~  ✅ `streetAddress`, `geo` lat/long, `hasMap` ajoutés.
+   **Reste** : créer/optimiser la fiche GBP réelle (avis, photos, horaires) et pointer `hasMap` vers l'URL exacte.
+6. ~~**[M1]** Schema `CollectionPage`~~ ✅ Ajouté sur catalogue et vendues.
+7. ~~**[M3]** Gérer les URLs `?q=`~~ ✅ `noindex, follow` injecté dynamiquement si `?q=` non vide.
 8. **[M4]** `alt` descriptif sur toutes les images ; convertir les photos voitures en WebP.
 9. **[M5]** Régénérer `sitemap.xml` avec `lastmod` réel à chaque mise à jour de stock.
-10. **[M6]** Ajouter `BreadcrumbList` sur catalogue et vendues.
+10. ~~**[M6]** Ajouter `BreadcrumbList` sur catalogue et vendues~~ ✅ Fait sur les deux pages.
 
 ---
 
