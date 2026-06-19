@@ -1,233 +1,57 @@
-# Plan d'Action SEO — Mrauto Canada
-**Mis à jour :** 14 juin 2026  
-**Basé sur :** Audit v2.0 — Score actuel : 58/100
+# Plan d'Action SEO — MR Auto Canada
+
+**Mis à jour :** 2026-06-19
+**Score actuel :** 59/100 · **Objectif court terme :** 80/100
+
+Priorités par impact/effort. Voir `FULL-AUDIT-REPORT.md` pour le détail.
 
 ---
 
-## CRITIQUE — À faire immédiatement
+## 🔴 Critique — cette semaine
 
-### C-1 · Bloquer /admin dans robots.txt
-**Effort :** 5 min | **Impact :** Sécurité + SEO
+1. **[C1] Ajouter un squelette HTML statique** dans `catalogue.html`, `fiche.html`, `vendues.html`
+   (comme l'index) : au minimum `<h1>`, intro, et liens vers les pages clés à l'intérieur du `#root`,
+   remplacés par React au chargement. → débloque l'indexation des pages rentables.
 
-Ajouter `Disallow: /admin` et `Disallow: /admin.html` dans robots.txt.
-
----
-
-### C-2 · Architecture fiche voiture — Migrer vers SSR ou Static Generation
-**Effort :** 3-5 jours | **Impact :** +25 pts de score SEO potentiel
-
-**Problème :** `fiche.html?id=XXX` avec rendu CSR = pages non indexables individuellement.
-
-**Solution recommandée : Next.js App Router**
-```
-/voitures/toyota-corolla-2019  <- URL propre, statique, indexable
-/voitures/honda-crv-2020
-```
-Chaque page générée avec `generateStaticParams()` depuis Supabase à build time.
-
-**Alternative rapide :** Pré-générer les fiches HTML depuis un script Node.js à chaque mise à jour du catalogue.
+2. **[C2] Supprimer la transpilation Babel runtime** : pré-compiler le JSX (esbuild/Vite, build Vercel)
+   et servir du JS statique. Retirer `@babel/standalone` et `type="text/babel"`.
+   → gain LCP/INP majeur sur mobile. Le plus gros chantier, le plus rentable.
 
 ---
 
-### C-3 · Supprimer Babel Standalone — Pré-compiler le JSX
-**Effort :** 1-2 jours | **Impact :** LCP -60%, score CWV +40 pts
+## 🟠 Élevé — sous 1 semaine
 
-Babel Standalone (882 KB) transpile le JSX dans le navigateur à chaque visite.
-La solution : pré-compiler une fois à l'étape de build (esbuild, Vite, ou Next.js).
+3. **[H1/H2] URLs voitures propres + sitemap dynamique** : routes `/voiture/<marque>-<modele>-<annee>-<id>`,
+   canonical par voiture côté serveur, et génération du `sitemap.xml` incluant chaque voiture en stock
+   (depuis Supabase). Mettre à jour `vercel.json`.
 
----
-
-## HAUTE PRIORITÉ — Semaine 1
-
-### H-1 · Schema AggregateRating sur la homepage
-**Effort :** 30 min | **Impact :** Rich snippets étoiles dans Google
-
-Ajouter dans le schéma AutoDealer existant :
-```json
-"aggregateRating": {
-  "@type": "AggregateRating",
-  "ratingValue": "5",
-  "reviewCount": "20",
-  "bestRating": "5"
-}
-```
+4. **[H3] Créer une image OG 1200×630 dédiée** (depuis `og-image-generator.html`), l'enregistrer
+   (`og-image.jpg`) et pointer `og:image` dessus sur toutes les pages. Vérifier l'aperçu WhatsApp.
 
 ---
 
-### H-2 · Schema ItemList sur vendues.html
-**Effort :** 1h | **Impact :** Google comprend que c'est une liste de produits
+## 🟡 Moyen — sous 1 mois
 
-Ajouter un bloc `ItemList` JSON-LD avec les voitures vendues.
-
----
-
-### H-3 · Enrichir llms.txt
-**Effort :** 30 min | **Impact :** Meilleure citation par ChatGPT, Perplexity, etc.
-
-Ajouter : processus d'achat en 5 étapes, FAQ complète, fourchette de prix (FCFA), zones desservies (quartiers de Dakar), marques typiques.
+5. **[M2]** Compléter le schema `LocalBusiness` : `streetAddress`, `geo` (lat/long), lien Google Business Profile.
+   Créer/optimiser la fiche GBP (avis, photos, horaires) — décisif pour le local pack à Dakar.
+6. **[M1]** Schema `CollectionPage`/`ItemList` sur catalogue et vendues ; `AggregateRating` si avis réels.
+7. **[M3]** Gérer les URLs `?q=` : canonical vers `/catalogue` ou `noindex` des résultats filtrés.
+8. **[M4]** `alt` descriptif sur toutes les images ; convertir les photos voitures en WebP.
+9. **[M5]** Régénérer `sitemap.xml` avec `lastmod` réel à chaque mise à jour de stock.
+10. **[M6]** Ajouter `BreadcrumbList` sur catalogue et vendues.
 
 ---
 
-### H-4 · OG Image dédiée par page (1200x630)
-**Effort :** 2h | **Impact :** +30% CTR sur les partages WhatsApp/Facebook
+## 🟢 Faible — backlog
 
-Créer 3 images OG 1200x630 (utiliser `og-image-generator.html` déjà présent) :
-- Home : Logo + tagline sur fond sombre
-- Catalogue : Grille voitures + titre
-- Vendues : Photo livraison + "20+ clients livrés"
-
-Remplacer les balises og:image sur chaque page.
+11. **[404]** Ajouter GA4 pour suivre les 404.
+12. Nettoyer les `preconnect`/`dns-prefetch` devenus inutiles après bundling.
+13. Cohérence du téléphone (`+221 77 834 64 64`) sur tout le site et dans `llms.txt`.
 
 ---
 
-### H-5 · Corriger le canonical de la home
-**Effort :** 5 min | **Impact :** Évite les conflits de canonicalisation
+## Mesure & suivi
 
-```html
-<!-- Avant -->
-<link rel="canonical" href="https://www.mrautocanada.com" />
-<!-- Après -->
-<link rel="canonical" href="https://www.mrautocanada.com/" />
-```
-
----
-
-### H-6 · Unifier la casse du nom de marque
-**Effort :** 15 min | **Impact :** Cohérence NAP pour le Local SEO
-
-Choisir "MRAUTO Canada" et l'appliquer dans le schema JSON-LD ET dans l'UI (footer, nav).
-
----
-
-### H-7 · Versionner hifi-components.jsx sur fiche.html
-**Effort :** 2 min | **Impact :** Évite le cache stale
-
-```html
-<script type="text/babel" src="hifi-components.jsx?v=4"></script>
-```
-
----
-
-## PRIORITÉ MOYENNE — Mois 1
-
-### M-1 · Adresse physique précise
-**Effort :** 30 min | **Impact :** Local SEO significatif
-
-Ajouter quartier / rue / point de repère dans le schéma JSON-LD, la section Contact et le footer.
-
----
-
-### M-2 · Section témoignages textuels + schema Review
-**Effort :** 2h | **Impact :** E-E-A-T fort + conversion
-
-3-5 témoignages de clients réels avec prénom, quartier, voiture. Schema Review correspondant.
-
----
-
-### M-3 · Schema WebSite + SearchAction
-**Effort :** 20 min | **Impact :** Éligibilité Sitelinks Search Box
-
-```json
-{
-  "@type": "WebSite",
-  "url": "https://www.mrautocanada.com/",
-  "name": "MRAUTO Canada",
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https://www.mrautocanada.com/catalogue?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-```
-
----
-
-### M-4 · Content-Security-Policy header
-**Effort :** 1h | **Impact :** Sécurité + signal confiance
-
-Ajouter une CSP dans vercel.json couvrant les domaines utilisés : unpkg.com, cdn.jsdelivr.net, fonts.googleapis.com, Supabase, Google Analytics.
-
----
-
-### M-5 · Enrichir la meta description de vendues.html
-**Effort :** 5 min
-
-```html
-<meta name="description" content="20+ voitures livrées à Dakar par Mrauto Canada depuis 2020. Toyota, Honda, Nissan — chaque vente, un client livré, papiers vérifiés. Zéro vice caché." />
-```
-
----
-
-### M-6 · Créer une page "À propos"
-**Effort :** 2h | **Impact :** E-E-A-T fort
-
-Photo fondateur, histoire depuis 2020, processus de sélection Canada, engagement qualité. Lien depuis la navigation.
-
----
-
-### M-7 · Lier le Google Business Profile
-**Effort :** 30 min | **Impact :** Local Pack Google Maps
-
-Créer/revendiquer GBP, ajouter le lien dans `sameAs` du schéma, ajouter "Voir nos avis Google" dans la section contact.
-
----
-
-## BASSE PRIORITÉ — Trimestre 1
-
-### L-1 · Articles de blog informatifs
-**Mots-clés cibles :**
-- "acheter voiture occasion Dakar"
-- "import voiture Canada Sénégal"
-- "voiture dédouanée Sénégal prix"
-
----
-
-### L-2 · Optimisation Google Business Profile
-Photos, réponses aux avis, posts hebdomadaires nouvelles arrivées.
-
----
-
-### L-3 · IndexNow pour Bing
-Utiliser le script `indexnow_submit.py` disponible pour notifier Bing de chaque nouvelle voiture.
-
----
-
-## Tableau de priorisation
-
-| ID | Action | Effort | Impact | Urgence |
-|----|--------|--------|--------|---------|
-| C-1 | Bloquer /admin robots.txt | 5 min | Moyen | IMMEDIAT |
-| C-2 | Migration SSR fiche pages | 3-5j | TRÈS FORT | IMMEDIAT |
-| C-3 | Supprimer Babel Standalone | 1-2j | TRÈS FORT | IMMEDIAT |
-| H-1 | Schema AggregateRating | 30 min | Moyen | Semaine 1 |
-| H-2 | Schema ItemList vendues | 1h | Moyen | Semaine 1 |
-| H-3 | Enrichir llms.txt | 30 min | Faible | Semaine 1 |
-| H-4 | OG Images 1200x630 | 2h | Moyen | Semaine 1 |
-| H-5 | Canonical trailing slash | 5 min | Faible | Semaine 1 |
-| H-6 | Unifier casse marque | 15 min | Faible | Semaine 1 |
-| H-7 | Version hifi-components fiche | 2 min | Faible | Semaine 1 |
-| M-1 | Adresse physique complete | 30 min | FORT | Mois 1 |
-| M-2 | Temoignages textuels | 2h | Fort | Mois 1 |
-| M-3 | Schema WebSite SearchAction | 20 min | Faible | Mois 1 |
-| M-4 | Content-Security-Policy | 1h | Moyen | Mois 1 |
-| M-5 | Meta desc vendues | 5 min | Faible | Mois 1 |
-| M-6 | Page A propos | 2h | Fort | Mois 1 |
-| M-7 | Lier Google Business Profile | 30 min | FORT | Mois 1 |
-| L-1 | Blog articles | 3h/article | Tres fort | Trimestre 1 |
-
----
-
-## Score projeté après corrections
-
-| Etape | Score estimé |
-|-------|-------------|
-| Actuellement | 58/100 |
-| + Quick wins (C-1, H-1 à H-7) | 65/100 |
-| + Mois 1 (M-1 à M-7) | 73/100 |
-| + Migration SSR (C-2) | 82/100 |
-| + Suppression Babel (C-3) | 87/100 |
-| + Contenu blog (L-1) | 91/100 |
-
----
-
-*Plan d'action généré le 14 juin 2026 — Mrauto Canada SEO Audit v2.0*
+- Connecter **Google Search Console** (couverture d'indexation, requêtes réelles) — priorité.
+- Surveiller LCP/INP via **Vercel Speed Insights** (déjà installé) avant/après le chantier C2.
+- Re-mesurer le score après C1+C2 (gain attendu : ~59 → ~78).
