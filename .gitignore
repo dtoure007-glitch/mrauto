@@ -1,5 +1,8 @@
 # Dependencies
 node_modules/
+
+# Build output (regeneré par Vercel à chaque déploiement)
+dist/
 npm-debug.log*
 yarn-error.log*
 
