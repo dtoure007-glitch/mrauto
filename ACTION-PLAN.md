@@ -13,9 +13,7 @@ Priorités par impact/effort. Voir `FULL-AUDIT-REPORT.md` pour le détail.
    (comme l'index) : au minimum `<h1>`, intro, et liens vers les pages clés à l'intérieur du `#root`,
    remplacés par React au chargement. → débloque l'indexation des pages rentables.
 
-2. **[C2] Supprimer la transpilation Babel runtime** : pré-compiler le JSX (esbuild/Vite, build Vercel)
-   et servir du JS statique. Retirer `@babel/standalone` et `type="text/babel"`.
-   → gain LCP/INP majeur sur mobile. Le plus gros chantier, le plus rentable.
+2. ~~**[C2] Supprimer la transpilation Babel runtime**~~ ✅ esbuild bundle React dans `dist/` (commit c853c93). `@babel/standalone` + CDN React supprimés des 3 pages. Vercel build : `npm run build`.
 
 ---
 
