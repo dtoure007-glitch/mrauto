@@ -702,11 +702,6 @@ function CatalogueSection() {
                   <HifiBtn variant="primary" href="/catalogue">
                     Voir tout le catalogue {hasMore ? `(${cars.length} voitures)` : '→'}
                   </HifiBtn>
-                  {hasMore && (
-                    <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--text-muted)', letterSpacing: '0.08em' }}>
-                      {cars.length - 6} voiture{cars.length - 6 > 1 ? 's' : ''} de plus
-                    </span>
-                  )}
                 </div>
               </>
         }
