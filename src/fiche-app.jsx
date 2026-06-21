@@ -169,14 +169,27 @@ function App() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    const id = new URLSearchParams(window.location.search).get('id');
-    if (!id) { setNotFound(true); setLoading(false); return; }
-    sb.from('cars').select('*').eq('id', id).single()
-      .then(({ data, error }) => {
-        if (error || !data) setNotFound(true);
-        else setCar(data);
-        setLoading(false);
-      });
+    const path = window.location.pathname;
+    if (path.startsWith('/voitures/')) {
+      const slug = path.replace('/voitures/', '');
+      sb.from('cars').select('*').eq('slug', slug).single()
+        .then(({ data, error }) => {
+          if (error || !data) setNotFound(true);
+          else setCar(data);
+          setLoading(false);
+        });
+    } else {
+      // Ancienne URL /fiche?id=UUID → redirect vers /voitures/slug
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { setNotFound(true); setLoading(false); return; }
+      sb.from('cars').select('*').eq('id', id).single()
+        .then(({ data, error }) => {
+          if (error || !data) { setNotFound(true); setLoading(false); return; }
+          if (data.slug) { window.location.replace(`/voitures/${data.slug}`); return; }
+          setCar(data);
+          setLoading(false);
+        });
+    }
   }, []);
 
   useEffect(() => {
@@ -187,7 +200,9 @@ function App() {
     const desc = car.description
       ? `${car.brand} ${car.model} ${car.year} à ${car.price} — ${car.description.slice(0, 120)}`
       : `Achetez cette ${car.brand} ${car.model} ${car.year} à ${car.price} chez MRAUTO Canada à Dakar. ${specs}. Livraison disponible.`;
-    const url = `https://www.mrautocanada.com/fiche${id ? '?id=' + id : ''}`;
+    const url = car.slug
+      ? `https://www.mrautocanada.com/voitures/${car.slug}`
+      : `https://www.mrautocanada.com/fiche?id=${new URLSearchParams(window.location.search).get('id') || ''}`;
 
     document.title = title;
     document.querySelector('meta[name="description"]').setAttribute('content', desc);
@@ -235,7 +250,7 @@ function App() {
       'itemListElement': [
         { '@type': 'ListItem', 'position': 1, 'name': 'Accueil',   'item': 'https://www.mrautocanada.com/' },
         { '@type': 'ListItem', 'position': 2, 'name': 'Catalogue', 'item': 'https://www.mrautocanada.com/catalogue' },
-        { '@type': 'ListItem', 'position': 3, 'name': `${car.brand} ${car.model} ${car.year}`, 'item': url }
+        { '@type': 'ListItem', 'position': 3, 'name': `${car.brand} ${car.model} ${car.year}`, 'item': car.slug ? `https://www.mrautocanada.com/voitures/${car.slug}` : url }
       ]
     };
     const bcEl = document.createElement('script');

@@ -169,10 +169,12 @@ export const CAR_GRADIENTS = [
 ];
 
 // ── CAR CARD ──────────────────────────────────────────────────────────────────
-export function CarCard({ id, index = 0, brand, model, year, price, km, fuel, transmission, color, featured, created_at, cover_photo }) {
+export function CarCard({ id, slug, index = 0, brand, model, year, price, km, fuel, transmission, color, featured, created_at, cover_photo }) {
   const [revealRef, revealed] = useScrollReveal();
   const isMobile = useIsMobile();
   const delay = index * 80;
+  // Les 3 premières cartes sont au-dessus du fold : pas d'animation pour ne pas retarder le FCP
+  const aboveFold = index < 3;
   const msg = encodeURIComponent(`Bonjour MRAUTO Canada, je suis intéressé(e) par la ${brand} ${model} ${year} à ${price}. Est-elle toujours disponible ?`);
 
   let badgeLabel = null;
@@ -190,9 +192,9 @@ export function CarCard({ id, index = 0, brand, model, year, price, km, fuel, tr
 
   return (
     <div ref={revealRef} style={{
-      opacity: revealed ? 1 : 0,
-      transform: revealed ? 'none' : 'translateY(32px)',
-      transition: `opacity 0.55s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.55s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
+      opacity: aboveFold || revealed ? 1 : 0,
+      transform: aboveFold || revealed ? 'none' : 'translateY(32px)',
+      transition: aboveFold ? 'none' : `opacity 0.55s cubic-bezier(0.22,1,0.36,1) ${delay}ms, transform 0.55s cubic-bezier(0.22,1,0.36,1) ${delay}ms`,
     }}>
       <div className="car-card"
         style={{
@@ -243,7 +245,7 @@ export function CarCard({ id, index = 0, brand, model, year, price, km, fuel, tr
             <SpecChip>{transmission}</SpecChip><SpecChip>{color}</SpecChip>
           </div>
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: 8, marginTop: 4 }}>
-            <HifiBtn variant="outline" size="sm" href={id ? `/fiche?id=${id}` : '#'} style={{ flex: 1 }}>Voir la fiche</HifiBtn>
+            <HifiBtn variant="outline" size="sm" href={slug ? `/voitures/${slug}` : (id ? `/fiche?id=${id}` : '#')} style={{ flex: 1 }}>Voir la fiche</HifiBtn>
             <HifiBtn variant="whatsapp" size="sm" href={`https://wa.me/221778346464?text=${msg}`} style={{ flex: 1, gap: 6 }}>
               <WaIcon size={13} /> WhatsApp
             </HifiBtn>

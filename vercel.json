@@ -11,6 +11,7 @@
     { "source": "/admin.html", "destination": "/admin", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/voitures/:slug", "destination": "/fiche.html" },
     { "source": "/voitures", "destination": "/index.html" },
     { "source": "/catalogue", "destination": "/catalogue.html" },
     { "source": "/fiche", "destination": "/fiche.html" },

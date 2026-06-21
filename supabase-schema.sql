@@ -40,6 +40,36 @@ alter table cars add column if not exists featured boolean not null default fals
 -- Prix de vente final (renseigné lors du marquage "vendue" dans l'admin)
 alter table cars add column if not exists prix_vente text;
 
+-- Slug SEO pour les URLs /voitures/toyota-rav4-2019-a3f2b1
+alter table cars add column if not exists slug text unique;
+
+update cars set slug = lower(
+  regexp_replace(brand, '[^a-zA-Z0-9]', '-', 'g') || '-' ||
+  regexp_replace(model, '[^a-zA-Z0-9]', '-', 'g') || '-' ||
+  year || '-' ||
+  substring(id::text, 1, 6)
+) where slug is null;
+
+create or replace function generate_car_slug()
+returns trigger as $$
+begin
+  if new.slug is null then
+    new.slug := lower(
+      regexp_replace(new.brand, '[^a-zA-Z0-9]', '-', 'g') || '-' ||
+      regexp_replace(new.model, '[^a-zA-Z0-9]', '-', 'g') || '-' ||
+      new.year || '-' ||
+      substring(new.id::text, 1, 6)
+    );
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+drop trigger if exists set_car_slug on cars;
+create trigger set_car_slug
+  before insert on cars
+  for each row execute function generate_car_slug();
+
 -- ── Table messages de contact ─────────────────────────────────────────────
 create table if not exists contact_messages (
   id           uuid primary key default gen_random_uuid(),

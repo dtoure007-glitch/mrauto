@@ -8,6 +8,10 @@ const sb = createClient(
   'sb_publishable_ORGOouzE5_jT5BCgqWLhKQ_Z3XnrPW7'
 );
 
+const PAGE_SIZE = 12;
+// Exclut photos[] et description — seule cover_photo est nécessaire sur le catalogue
+const CAR_COLS = 'id,slug,brand,model,year,price,km,fuel,transmission,color,badge,featured,created_at,cover_photo';
+
 function goBack(fallback) {
   try {
     if (document.referrer && new URL(document.referrer).origin === window.location.origin) {
@@ -23,7 +27,7 @@ function useCars() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     sb.from('cars')
-      .select('*')
+      .select(CAR_COLS)
       .eq('status', 'available')
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
@@ -121,12 +125,15 @@ function Page() {
   const [query, setQuery] = useState(
     () => new URLSearchParams(window.location.search).get('q') || ''
   );
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
   useEffect(() => {
     const url = new URL(window.location.href);
     if (query.trim()) { url.searchParams.set('q', query.trim()); }
     else { url.searchParams.delete('q'); }
     history.replaceState(null, '', url);
+    // Réinitialise la pagination à chaque nouvelle recherche
+    setVisibleCount(PAGE_SIZE);
   }, [query]);
 
   const filtered = useMemo(() => {
@@ -137,6 +144,9 @@ function Page() {
         .some(v => v && String(v).toLowerCase().includes(q))
     );
   }, [cars, query]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const hasMore = filtered.length > visibleCount;
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
@@ -160,9 +170,9 @@ function Page() {
                   Chaque voiture est inspectée avant mise en vente.
                 </p>
               </div>
-              {!loading && !isMobile && (
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'var(--accent)', lineHeight: 1, letterSpacing: '-0.02em', flexShrink: 0 }}>
-                  {filtered.length}<span style={{ fontSize: 20, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)', marginLeft: 8, verticalAlign: 'middle' }}>dispo</span>
+              {!isMobile && (
+                <div style={{ fontFamily: 'var(--font-display)', fontSize: 72, fontWeight: 900, color: 'var(--accent)', lineHeight: 1, letterSpacing: '-0.02em', flexShrink: 0, minWidth: 120 }}>
+                  {loading ? ' ' : filtered.length}<span style={{ fontSize: 20, letterSpacing: '0.06em', color: 'rgba(255,255,255,0.3)', marginLeft: 8, verticalAlign: 'middle' }}>{loading ? '' : 'dispo'}</span>
                 </div>
               )}
             </div>
@@ -209,7 +219,7 @@ function Page() {
             <div style={{ textAlign: 'center', padding: '80px 0', fontFamily: 'var(--font-body)', fontSize: 13, color: 'var(--text-muted)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               Chargement du catalogue…
             </div>
-          ) : filtered.length === 0 ? (
+          ) : visible.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 0' }}>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: 30, fontWeight: 900, textTransform: 'uppercase', color: 'var(--text)', marginBottom: 14 }}>
                 {query ? `Aucun résultat pour "${query}"` : 'Aucune voiture disponible pour le moment'}
@@ -232,8 +242,15 @@ function Page() {
                 </p>
               )}
               <div className="cars-grid">
-                {filtered.map((c, i) => <CarCard key={c.id} index={i} {...c} />)}
+                {visible.map((c, i) => <CarCard key={c.id} index={i} {...c} />)}
               </div>
+              {hasMore && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 40 }}>
+                  <HifiBtn variant="outline" onClick={() => setVisibleCount(n => n + PAGE_SIZE)}>
+                    Voir {Math.min(PAGE_SIZE, filtered.length - visibleCount)} voiture{filtered.length - visibleCount > 1 ? 's' : ''} de plus
+                  </HifiBtn>
+                </div>
+              )}
             </>
           )}
         </div>

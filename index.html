@@ -462,7 +462,7 @@ function useCars() {
   const [loading, setLoading] = React.useState(true);
   React.useEffect(() => {
     sb.from('cars')
-      .select('*')
+      .select('id,slug,brand,model,year,price,km,fuel,transmission,color,badge,featured,created_at,cover_photo')
       .eq('status', 'available')
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
@@ -486,8 +486,11 @@ function useFeatured() {
 function useSoldCars() {
   const [soldCars, setSoldCars] = React.useState([]);
   React.useEffect(() => {
-    sb.from('cars').select('*').eq('status', 'sold')
+    sb.from('cars')
+      .select('id,brand,model,cover_photo')
+      .eq('status', 'sold')
       .order('created_at', { ascending: false })
+      .limit(9)
       .then(({ data }) => { if (data) setSoldCars(data); });
   }, []);
   return soldCars;
@@ -523,6 +526,7 @@ function HeroCarousel({ photos, alt }) {
           src={src}
           alt={alt}
           fetchPriority={i === 0 ? "high" : "auto"}
+          loading={i === 0 ? "eager" : "lazy"}
           decoding="async"
           width="1600" height="900"
           style={{

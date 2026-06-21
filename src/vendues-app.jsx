@@ -226,7 +226,7 @@ function Page() {
 
   useEffect(() => {
     sb.from('cars')
-      .select('*')
+      .select('id,slug,brand,model,year,price,prix_vente,km,fuel,transmission,color,badge,featured,created_at,cover_photo,photos')
       .eq('status', 'sold')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
