@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { createRoot } from 'react-dom/client';
+import { toWebP } from './hifi-components.jsx';
 
 const { createClient } = window.supabase;
 const sb = createClient(
@@ -156,7 +157,7 @@ function SoldCard({ car, index = 0 }) {
         {/* Photo */}
         <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0, background: 'linear-gradient(150deg,#d8d8d8,#c4c4c4)' }}>
           {src
-            ? <img src={src} alt={`${car.brand} ${car.model}`}
+            ? <img src={toWebP(src, 800)} alt={`${car.brand} ${car.model}`}
                 loading={index < 3 ? 'eager' : 'lazy'}
                 fetchPriority={index === 0 ? 'high' : 'auto'}
                 decoding="async"

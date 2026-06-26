@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
-import { MStripe, HifiBtn, WaIcon, useIsMobile, SpecChip, HifiFooter } from './hifi-components.jsx';
+import { MStripe, HifiBtn, WaIcon, useIsMobile, SpecChip, HifiFooter, toWebP } from './hifi-components.jsx';
 
 const { createClient } = window.supabase;
 const sb = createClient(
@@ -36,7 +36,7 @@ function PhotoGallery({ photos, brand, model }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ position: 'relative', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-        <img src={photos[idx]} alt={`${brand} ${model} — photo ${idx + 1}`}
+        <img src={toWebP(photos[idx], 1200)} alt={`${brand} ${model} — photo ${idx + 1}`}
           fetchPriority="high" decoding="async"
           width="1200" height="800"
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -58,7 +58,7 @@ function PhotoGallery({ photos, brand, model }) {
           {photos.map((url, i) => (
             <div key={i} onClick={() => setIdx(i)}
               style={{ width: isMobile ? 88 : 82, height: isMobile ? 80 : 60, flexShrink: 0, cursor: 'pointer', border: i === idx ? '2px solid var(--accent)' : '2px solid transparent', overflow: 'hidden', transition: 'border-color 0.15s' }}>
-              <img src={url} alt="" loading="lazy" width="88" height="80" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={toWebP(url, 200)} alt="" loading="lazy" width="88" height="80" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
           ))}
         </div>

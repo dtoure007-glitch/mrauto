@@ -58,6 +58,13 @@ export function MStripe({ height = 3, vertical = false, style = {} }) {
   );
 }
 
+// ── SUPABASE IMAGE TRANSFORM ──────────────────────────────────────────────────
+export function toWebP(url, width = 800, quality = 80) {
+  if (!url || !url.includes('/storage/v1/object/public/')) return url;
+  return url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+    + `?width=${width}&format=webp&quality=${quality}`;
+}
+
 // ── IMAGE PLACEHOLDER ─────────────────────────────────────────────────────────
 export function ImgPlaceholder({ label, style = {}, bg, overlay = false }) {
   return (
@@ -215,7 +222,7 @@ export function CarCard({ id, slug, index = 0, brand, model, year, price, km, fu
         }}>
         <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0 }}>
           {cover_photo
-            ? <img src={cover_photo} alt={`${brand} ${model}`}
+            ? <img src={toWebP(cover_photo, 800)} alt={`${brand} ${model}`}
                 loading={index < 3 ? 'eager' : 'lazy'}
                 fetchPriority={index === 0 ? 'high' : 'auto'}
                 decoding="async"
